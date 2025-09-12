@@ -107,9 +107,4 @@ public class DMSRepository implements RepositoryImpl {
         return liveData;
     }
 
-    private String parseVolleyError(VolleyError error) {
-        if (error.getMessage() != null) return error.getMessage();
-        return "Network error";
-    }
-
 }

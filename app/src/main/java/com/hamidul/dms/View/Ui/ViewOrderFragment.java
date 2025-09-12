@@ -25,17 +25,20 @@ import com.hamidul.dms.Service.Model.OrderedOutlet;
 import com.hamidul.dms.Service.Model.User;
 import com.hamidul.dms.Service.Repository.Resource;
 import com.hamidul.dms.View.Adapter.OrderedOutletAdapter;
+import com.hamidul.dms.View.Manager.KeyboardVisibilityHelper;
 import com.hamidul.dms.View.Manager.ToastInstance;
 import com.hamidul.dms.ViewModel.DMSViewModel;
 
 import java.util.ArrayList;
 
 public class ViewOrderFragment extends Fragment {
+    private View mainView;
     private ProgressBar progressBar;
     private RecyclerView recyclerView;
     private OrderedOutletAdapter adapter;
     private DMSViewModel viewModel;
     private User user;
+    private KeyboardVisibilityHelper keyboardHelper;
 
     public ViewOrderFragment() {
 
@@ -70,6 +73,31 @@ public class ViewOrderFragment extends Fragment {
                 return false;
             }
         });*/
+
+        /*mainView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            Rect r = new Rect();
+            mainView.getWindowVisibleDisplayFrame(r);
+            int screenHeight = mainView.getRootView().getHeight();
+
+            int keypadHeight = screenHeight - r.bottom;
+
+            if (keypadHeight > screenHeight * 0.15) {
+                // Keyboard is open
+                mainView.setPadding(0, 0, 0, keypadHeight);
+            } else {
+                // Keyboard is closed
+                mainView.setPadding(0, 0, 0, 0);
+            }
+        });*/
+
+        keyboardHelper = new KeyboardVisibilityHelper(mainView, recyclerView, (visible, keyboardHeight) -> {
+            // optional: adjust bottom padding if needed
+            if (visible) {
+                mainView.setPadding(0, 0, 0, keyboardHeight);
+            } else {
+                mainView.setPadding(0, 0, 0, 0);
+            }
+        });
 
         // --- when scroll recyclerview then hide keyboard ---
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -111,6 +139,7 @@ public class ViewOrderFragment extends Fragment {
     //************************************************************************************
     private void findViewById(View myView) {
         viewModel = new ViewModelProvider(this).get(DMSViewModel.class);
+        mainView = myView.findViewById(R.id.productView);
         progressBar = myView.findViewById(R.id.progressBar);
         recyclerView = myView.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -133,4 +162,11 @@ public class ViewOrderFragment extends Fragment {
         ((MainActivity) requireActivity()).setToolbarTitle(user.getName());
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (keyboardHelper != null) {
+            keyboardHelper.detach();
+        }
+    }
 }

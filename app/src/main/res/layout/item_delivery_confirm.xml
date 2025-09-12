@@ -136,7 +136,9 @@
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="none" />
+            android:clipToPadding="false"
+            android:scrollbars="none"
+            android:descendantFocusability="afterDescendants"/>
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
