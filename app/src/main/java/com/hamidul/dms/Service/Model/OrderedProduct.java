@@ -61,8 +61,17 @@ public class OrderedProduct implements Parcelable {
         product.tp = object.optDouble("rate");
         product.discount = object.optString("discount");
         product.totalAmount = Double.parseDouble(product.getQuantity()) * product.getTp();
-        product.netAmount = product.getTotalAmount() - Double.parseDouble(product.getDiscount());
+        product.netAmount = product.getTotalAmount() - product.safeParseDouble(product.getDiscount());
         return product;
+    }
+
+    private double safeParseDouble(String value) {
+        if (value == null || value.trim().isEmpty()) return 0;
+        try {
+            return Double.parseDouble(value);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     public int getProductId() {
