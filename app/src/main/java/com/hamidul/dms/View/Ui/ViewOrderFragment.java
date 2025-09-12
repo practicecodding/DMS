@@ -7,13 +7,13 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -58,7 +58,8 @@ public class ViewOrderFragment extends Fragment {
         adapter = new OrderedOutletAdapter(getContext(), new ArrayList<>());
         recyclerView.setAdapter(adapter);
 
-        recyclerView.setOnTouchListener(new View.OnTouchListener() {
+        // --- when touch recyclerview item then hide keyboard ---
+        /*recyclerView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 View focusedView = getActivity().getCurrentFocus();
@@ -67,6 +68,21 @@ public class ViewOrderFragment extends Fragment {
                     hideKeyboard(v);
                 }
                 return false;
+            }
+        });*/
+
+        // --- when scroll recyclerview then hide keyboard ---
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState != RecyclerView.SCROLL_STATE_IDLE) {
+                    View focusView = getActivity().getCurrentFocus();
+                    if (focusView instanceof EditText) {
+                        focusView.clearFocus();
+                        hideKeyboard(focusView);
+                    }
+                }
             }
         });
 
@@ -105,7 +121,7 @@ public class ViewOrderFragment extends Fragment {
 
     //************************************************************************************
     public void hideKeyboard(View view) {
-        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 

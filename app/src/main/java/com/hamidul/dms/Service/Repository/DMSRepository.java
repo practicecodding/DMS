@@ -23,10 +23,6 @@ import java.util.ArrayList;
 public class DMSRepository implements RepositoryImpl {
     private static DMSRepository repository;
     private static Context ctx;
-    //    private ArrayList<User> users;
-//    private MutableLiveData<ArrayList<User>> mUsers;
-//    private ArrayList<OrderedOutlet> orderedOutlets;
-    private MutableLiveData<ArrayList<OrderedOutlet>> mOrderedOutlets;
 
     public static DMSRepository getRepository(Context context) {
         if (repository == null) {
@@ -61,7 +57,7 @@ public class DMSRepository implements RepositoryImpl {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                liveData.setValue(Resource.error(volleyError.getMessage(), null));
+                liveData.setValue(Resource.error("Network error", null));
             }
         });
 

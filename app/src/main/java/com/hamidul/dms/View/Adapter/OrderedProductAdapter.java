@@ -21,10 +21,16 @@ import java.util.ArrayList;
 public class OrderedProductAdapter extends RecyclerView.Adapter<OrderedProductAdapter.OrderProductAdapterViewHolder> {
     private final Context context;
     private final ArrayList<OrderedProduct> orderedProducts;
+    private final OnProductChangeListener listener;
 
-    public OrderedProductAdapter(Context context, ArrayList<OrderedProduct> orderedProducts) {
+    public interface OnProductChangeListener {
+        void onProductChanged();
+    }
+
+    public OrderedProductAdapter(Context context, ArrayList<OrderedProduct> orderedProducts, OnProductChangeListener listener) {
         this.context = context;
         this.orderedProducts = orderedProducts;
+        this.listener = listener;
     }
 
     @NonNull
@@ -38,13 +44,10 @@ public class OrderedProductAdapter extends RecyclerView.Adapter<OrderedProductAd
         OrderedProduct product = orderedProducts.get(position);
         holder.tvSkuName.setText(product.getProductName());
 
-        if (orderedProducts.get(position).getTp() % 1 == 0) {
-            holder.tvTp.setText(String.format("%,.0f", product.getTp()));
-        } else {
-            holder.tvTp.setText(String.format("%,.2f", product.getTp()));
-        }
+        holder.tvTp.setText(formatDouble(product.getTp()));
 
-        /*if (holder.edQuantity instanceof TextWatcher) {
+        // --- Quantity ---
+        if (holder.edQuantity instanceof TextWatcher) {
             holder.edQuantity.removeTextChangedListener((TextWatcher) holder.edQuantity.getTag());
         }
         holder.edQuantity.setText(orderedProducts.get(position).getQuantity());
@@ -56,8 +59,11 @@ public class OrderedProductAdapter extends RecyclerView.Adapter<OrderedProductAd
                 if (!s.isEmpty() && s.startsWith("0")) {
                     editable.delete(0, 1);
                 }
+
                 if (s.isEmpty()) {
-                    orderedProducts.get(position).setDiscount("0");
+                    product.setQuantity("0");
+                    holder.edQuantity.setText("0");
+                    product.setDiscount("0");
                 }
             }
 
@@ -69,26 +75,36 @@ public class OrderedProductAdapter extends RecyclerView.Adapter<OrderedProductAd
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                orderedProducts.get(position).setQuantity(charSequence.toString());
-                orderedProducts.get(position).setDiscount("0");
+                product.setQuantity(charSequence.toString());
+                product.setDiscount("0");
+                product.setTotalAmount(Double.parseDouble(product.getQuantity()) * product.getTp());
+                product.setNetAmount(product.getTotalAmount() - Double.parseDouble(product.getDiscount()));
                 holder.edDiscount.setText(orderedProducts.get(position).getDiscount());
+
+                if (listener != null) listener.onProductChanged();
+
             }
         };
 
         holder.edQuantity.addTextChangedListener(watcherQuantity);
         holder.edQuantity.setTag(watcherQuantity);
 
+        // --- Discount ---
         if (holder.edDiscount instanceof TextWatcher) {
             holder.edDiscount.removeTextChangedListener((TextWatcher) holder.edDiscount.getTag());
         }
-        holder.edDiscount.setText(orderedProducts.get(position).getDiscount());
+        holder.edDiscount.setText(product.getDiscount());
 
         TextWatcher watcherDiscount = new TextWatcher() {
             @Override
             public void afterTextChanged(Editable editable) {
-                String s = editable.toString();
+                String s = editable.toString().trim();
                 if (!s.isEmpty() && s.startsWith("0")) {
                     editable.delete(0, 1);
+                }
+
+                if (s.isEmpty()) {
+                    holder.edDiscount.setText(s);
                 }
             }
 
@@ -99,16 +115,17 @@ public class OrderedProductAdapter extends RecyclerView.Adapter<OrderedProductAd
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                orderedProducts.get(position).setDiscount(charSequence.toString());
+                product.setDiscount(charSequence.toString());
+                product.setNetAmount(product.getTotalAmount() - Double.parseDouble(product.getDiscount()));
+                if (listener != null) listener.onProductChanged();
             }
         };
 
         holder.edDiscount.addTextChangedListener(watcherDiscount);
-        holder.edDiscount.setTag(watcherDiscount);*/
+        holder.edDiscount.setTag(watcherDiscount);
 
         // --- Quantity ---
-        if (holder.edQuantity.getTag() instanceof TextWatcher) {
+        /*if (holder.edQuantity.getTag() instanceof TextWatcher) {
             holder.edQuantity.removeTextChangedListener((TextWatcher) holder.edQuantity.getTag());
         }
 
@@ -146,7 +163,7 @@ public class OrderedProductAdapter extends RecyclerView.Adapter<OrderedProductAd
             }
         };
         holder.edDiscount.addTextChangedListener(watcherDiscount);
-        holder.edDiscount.setTag(watcherDiscount);
+        holder.edDiscount.setTag(watcherDiscount);*/
 
     }
 
@@ -169,11 +186,21 @@ public class OrderedProductAdapter extends RecyclerView.Adapter<OrderedProductAd
         }
     }
 
+    //************************************************************************************
+    private String formatDouble(double value) {
+        return (value % 1 == 0) ? String.format("%,.0f", value) : String.format("%,.2f", value);
+    }
+
+    //************************************************************************************
     public abstract static class SimpleTextWatcher implements TextWatcher {
-        @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-        @Override public void afterTextChanged(android.text.Editable s) {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void afterTextChanged(android.text.Editable s) {
             String string = s.toString();
-            if (string.equals("0")){
+            if (string.equals("0")) {
                 s.clear();
             }
         }

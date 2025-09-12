@@ -9,8 +9,8 @@ public class OrderedProduct implements Parcelable {
     private int productId;
     private String productName;
     private double tp;
-    private String quantity;
-    private String discount;
+    private String quantity, discount;
+    private double totalAmount, netAmount;
 
     public OrderedProduct() {
     }
@@ -21,6 +21,8 @@ public class OrderedProduct implements Parcelable {
         tp = in.readDouble();
         quantity = in.readString();
         discount = in.readString();
+        totalAmount = in.readDouble();
+        netAmount = in.readDouble();
     }
 
     @Override
@@ -30,6 +32,8 @@ public class OrderedProduct implements Parcelable {
         dest.writeDouble(tp);
         dest.writeString(quantity);
         dest.writeString(discount);
+        dest.writeDouble(totalAmount);
+        dest.writeDouble(netAmount);
     }
 
     @Override
@@ -56,6 +60,8 @@ public class OrderedProduct implements Parcelable {
         product.quantity = object.optString("quantity");
         product.tp = object.optDouble("rate");
         product.discount = object.optString("discount");
+        product.totalAmount = Double.parseDouble(product.getQuantity()) * product.getTp();
+        product.netAmount = product.getTotalAmount() - Double.parseDouble(product.getDiscount());
         return product;
     }
 
@@ -97,5 +103,21 @@ public class OrderedProduct implements Parcelable {
 
     public void setDiscount(String discount) {
         this.discount = discount;
+    }
+
+    public double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public double getNetAmount() {
+        return netAmount;
+    }
+
+    public void setNetAmount(double netAmount) {
+        this.netAmount = netAmount;
     }
 }
