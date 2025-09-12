@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="gainsboro">#DCDCDC</color>
+    <color name="brightGray">#EBEBEB</color>
+    <color name="lightGray">#D3D3D3</color>
+    <color name="gray">#808080</color>
+
+    <color name="backgroundColor">#F0F0F7</color>
+    <color name="cardColor">#FFFFFF</color>
+    <color name="subCardColor">#efefef</color>
+    <color name="toolbarColor">#9C27B0</color>
+
+    <color name="whiteBackground">#efefef</color>
+    <color name="totalTextColor">#4CAF50</color>
+    <color name="kelloggsTextColor">#F44336</color>
+    <color name="pringlesTextColor">#E91E63</color>
+    <color name="userColor">#079C27B0</color>
+    <color name="shimmerBackgroundColor">#dddddd</color>
+    <color name="shimmerTextColor">#1A9C27B0</color>
+</resources>
