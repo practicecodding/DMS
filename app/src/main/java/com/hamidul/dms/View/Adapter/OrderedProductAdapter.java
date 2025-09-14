@@ -43,22 +43,44 @@ public class OrderedProductAdapter extends RecyclerView.Adapter<OrderedProductAd
     public void onBindViewHolder(@NonNull OrderProductAdapterViewHolder holder, @SuppressLint("RecyclerView") int position) {
         OrderedProduct product = orderedProducts.get(position);
         holder.tvSkuName.setText(product.getProductName());
+
         holder.tvTp.setText(formatDouble(product.getTp()));
 
         // --- Quantity ---
         if (holder.edQuantity instanceof TextWatcher) {
             holder.edQuantity.removeTextChangedListener((TextWatcher) holder.edQuantity.getTag());
         }
-        holder.edQuantity.setText(product.getQuantity());
+        holder.edQuantity.setText(orderedProducts.get(position).getQuantity());
 
         TextWatcher watcherQuantity = new TextWatcher() {
             @Override
             public void afterTextChanged(Editable editable) {
-                String s = editable.toString();
+                String s = editable.toString().trim();
 
-                if (!s.isEmpty() && s.startsWith("0")) {
+                /*if (!s.isEmpty() && s.startsWith("0")) {
                     editable.delete(0, 1);
                 }
+
+                if (s.isEmpty()) {
+                    product.setQuantity("0");
+                    holder.edQuantity.setText("0");
+                    product.setDiscount("0");
+                }*/
+
+                if (s.isEmpty()) {
+                    s = "0"; // default if empty
+                    holder.edQuantity.setText(s);
+                    holder.edQuantity.setSelection(s.length()); // move cursor to end
+                }
+
+                product.setQuantity(s);
+                product.setDiscount("0");
+                holder.edDiscount.setText("0");
+
+                product.setTotalAmount(Double.parseDouble(product.getQuantity()) * product.getTp());
+                product.setNetAmount(product.getTotalAmount() - safeParseDouble(product.getDiscount()));
+
+                if (listener != null) listener.onProductChanged();
 
             }
 
@@ -70,12 +92,13 @@ public class OrderedProductAdapter extends RecyclerView.Adapter<OrderedProductAd
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                product.setQuantity(charSequence.toString());
+                /*product.setQuantity(charSequence.toString());
                 product.setDiscount("0");
+                product.setTotalAmount(Double.parseDouble(product.getQuantity()) * product.getTp());
+                product.setNetAmount(product.getTotalAmount() - Double.parseDouble(product.getDiscount()));
                 holder.edDiscount.setText(product.getDiscount());
-                product.setTotalAmount(safeParseDouble(product.getQuantity()) * product.getTp());
-                product.setNetAmount(product.getTotalAmount() - safeParseDouble(product.getDiscount()));
-                if (listener != null) listener.onProductChanged();
+
+                if (listener != null) listener.onProductChanged();*/
 
             }
         };
@@ -94,9 +117,25 @@ public class OrderedProductAdapter extends RecyclerView.Adapter<OrderedProductAd
             public void afterTextChanged(Editable editable) {
                 String s = editable.toString().trim();
 
-                if (!s.isEmpty() && s.startsWith("0")) {
+                /*if (!s.isEmpty() && s.startsWith("0")) {
                     editable.delete(0, 1);
                 }
+
+                if (s.isEmpty()) {
+                    holder.edDiscount.setText(s);
+                }*/
+
+                if (s.isEmpty()) {
+                    s = "0"; // default if empty
+                    holder.edDiscount.setText(s);
+                    holder.edDiscount.setSelection(s.length());
+                }
+
+                product.setDiscount(s);
+
+                product.setNetAmount(product.getTotalAmount() - safeParseDouble(product.getDiscount()));
+
+                if (listener != null) listener.onProductChanged();
 
             }
 
@@ -107,9 +146,9 @@ public class OrderedProductAdapter extends RecyclerView.Adapter<OrderedProductAd
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                product.setDiscount(charSequence.toString());
-                product.setNetAmount(product.getTotalAmount() - safeParseDouble(product.getDiscount()));
-                if (listener != null) listener.onProductChanged();
+                /*product.setDiscount(charSequence.toString());
+                product.setNetAmount(product.getTotalAmount() - Double.parseDouble(product.getDiscount()));
+                if (listener != null) listener.onProductChanged();*/
             }
         };
 
@@ -198,7 +237,6 @@ public class OrderedProductAdapter extends RecyclerView.Adapter<OrderedProductAd
         }
     }
 
-    //************************************************************************************
     private double safeParseDouble(String value) {
         if (value == null || value.trim().isEmpty()) return 0;
         try {
