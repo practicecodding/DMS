@@ -6,6 +6,8 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -287,6 +289,9 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
             tilDamageAmount.setVisibility(VISIBLE);
             tilCommissionAmount.setVisibility(VISIBLE);
 
+            edDamageAmount.addTextChangedListener(watcher);
+            edCommissionAmount.addTextChangedListener(watcher);
+
             alertDialog = builder.create();
 
             buttonYes.setOnClickListener(new View.OnClickListener() {
@@ -341,6 +346,10 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
             tilDamageAmount.setVisibility(VISIBLE);
             tilCommissionAmount.setVisibility(VISIBLE);
             tilCashAmount.setVisibility(VISIBLE);
+
+            edDamageAmount.addTextChangedListener(watcher);
+            edCommissionAmount.addTextChangedListener(watcher);
+            edCashAmount.addTextChangedListener(watcher);
 
             alertDialog = builder.create();
 
@@ -462,6 +471,30 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
         VolleyInstance.getVolleyInstance(context).addToRequestQueue(jsonArrayRequest);
     }
 
+    //************************************************************************************
+    private TextWatcher watcher = new TextWatcher() {
+        @Override
+        public void afterTextChanged(Editable editable) {
+
+            String s = editable.toString().trim();
+
+            if (!s.isEmpty() && s.startsWith("0")) {
+                editable.delete(0, 1);
+            }
+
+
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+    };
     //************************************************************************************
     public void hideKeyboard(View view) {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
