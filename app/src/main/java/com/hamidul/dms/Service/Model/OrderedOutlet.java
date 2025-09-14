@@ -13,10 +13,15 @@ public class OrderedOutlet implements Parcelable {
     private int userId;
     private String outletId;
     private String outletName;
+    private String outletBanglaName;
+    private String outletAddress;
     private String routeName;
     private String date;
     private String business;
     private ArrayList<OrderedProduct> orderedProducts;
+    private double totalAmount;
+    private double totalDiscount;
+    private double netAmount;
     private boolean isLoading;
 
     public OrderedOutlet() {
@@ -29,9 +34,14 @@ public class OrderedOutlet implements Parcelable {
         userId = in.readInt();
         outletId = in.readString();
         outletName = in.readString();
+        outletBanglaName = in.readString();
+        outletAddress = in.readString();
         routeName = in.readString();
         date = in.readString();
         business = in.readString();
+        totalAmount = in.readDouble();
+        totalDiscount = in.readDouble();
+        netAmount = in.readDouble();
         isLoading = in.readByte() != 0;
     }
 
@@ -41,9 +51,14 @@ public class OrderedOutlet implements Parcelable {
         dest.writeInt(userId);
         dest.writeString(outletId);
         dest.writeString(outletName);
+        dest.writeString(outletBanglaName);
+        dest.writeString(outletAddress);
         dest.writeString(routeName);
         dest.writeString(date);
         dest.writeString(business);
+        dest.writeDouble(totalAmount);
+        dest.writeDouble(totalDiscount);
+        dest.writeDouble(netAmount);
         dest.writeByte((byte) (isLoading ? 1 : 0));
     }
 
@@ -71,6 +86,8 @@ public class OrderedOutlet implements Parcelable {
         outlet.userId = object.optInt("user_id");
         outlet.outletId = object.optString("outlet_id");
         outlet.outletName = object.optString("outlet_name");
+        outlet.outletBanglaName = object.optString("outlet_bangla_name");
+        outlet.outletAddress = object.optString("outlet_address");
         outlet.routeName = object.optString("route_name");
         outlet.date = object.optString("date");
         outlet.business = object.optString("business");
@@ -119,6 +136,22 @@ public class OrderedOutlet implements Parcelable {
         this.outletName = outletName;
     }
 
+    public String getOutletBanglaName() {
+        return outletBanglaName;
+    }
+
+    public void setOutletBanglaName(String outletBanglaName) {
+        this.outletBanglaName = outletBanglaName;
+    }
+
+    public String getOutletAddress() {
+        return outletAddress;
+    }
+
+    public void setOutletAddress(String outletAddress) {
+        this.outletAddress = outletAddress;
+    }
+
     public String getRouteName() {
         return routeName;
     }
@@ -149,6 +182,30 @@ public class OrderedOutlet implements Parcelable {
 
     public void setOrderedProducts(ArrayList<OrderedProduct> orderedProducts) {
         this.orderedProducts = orderedProducts;
+    }
+
+    public double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public double getTotalDiscount() {
+        return totalDiscount;
+    }
+
+    public void setTotalDiscount(double totalDiscount) {
+        this.totalDiscount = totalDiscount;
+    }
+
+    public double getNetAmount() {
+        return netAmount;
+    }
+
+    public void setNetAmount(double netAmount) {
+        this.netAmount = netAmount;
     }
 
     public boolean isLoading() {

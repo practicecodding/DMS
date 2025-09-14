@@ -1,5 +1,7 @@
 package com.hamidul.dms.View.Adapter;
 
+import static android.view.View.VISIBLE;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -7,6 +9,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -20,13 +23,12 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.Volley;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.hamidul.dms.R;
 import com.hamidul.dms.Service.Model.OrderedOutlet;
 import com.hamidul.dms.Service.Model.OrderedProduct;
@@ -38,7 +40,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Objects;
 
 public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdapter.OrderedOutletAdapterViewHolder> {
@@ -61,8 +66,16 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
     public void onBindViewHolder(@NonNull OrderedOutletAdapterViewHolder holder, int position) {
 
         OrderedOutlet outlet = orderedOutlets.get(position);
-        holder.tvDate.setText(outlet.getDate());
+        try {
+            Date date = new SimpleDateFormat("dd-MM-yyyy").parse(outlet.getDate());
+            holder.tvDate.setText(new SimpleDateFormat("dd-MMM-yyyy").format(date));
+            holder.tvDow.setText(new SimpleDateFormat("EEEE").format(date));
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
         holder.tvOutletName.setText(outlet.getOutletName());
+        holder.tvOutletBanglaName.setText(outlet.getOutletBanglaName());
+        holder.tvOutletAddress.setText(outlet.getOutletAddress());
 
         OrderedProductAdapter adapter = new OrderedProductAdapter(context, outlet.getOrderedProducts(), () -> updateAmount(outlet, holder));
         holder.recyclerView.setAdapter(adapter);
@@ -78,11 +91,11 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
         holder.buttonDue.setBackground(grayDrawable);
 
         if (outlet.isLoading()) {
-            holder.progressBar.setVisibility(View.VISIBLE);
+            holder.progressBar.setVisibility(VISIBLE);
             holder.buttonView.setVisibility(View.GONE);
         } else {
             holder.progressBar.setVisibility(View.GONE);
-            holder.buttonView.setVisibility(View.VISIBLE);
+            holder.buttonView.setVisibility(VISIBLE);
         }
 
         holder.buttonReturn.setOnClickListener(new View.OnClickListener() {
@@ -95,6 +108,26 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
             }
         });
 
+        holder.buttonDue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int currentPosition = holder.getAdapterPosition();
+                if (currentPosition != RecyclerView.NO_POSITION) {
+                    dialogConfirmDueDelivered(currentPosition);
+                }
+            }
+        });
+
+        holder.buttonPaid.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int currentPosition = holder.getAdapterPosition();
+                if (currentPosition != RecyclerView.NO_POSITION) {
+                    dialogConfirmPaidDelivered(currentPosition);
+                }
+            }
+        });
+
     }
 
     @Override
@@ -103,7 +136,7 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
     }
 
     public class OrderedOutletAdapterViewHolder extends RecyclerView.ViewHolder {
-        private final TextView tvDate, tvOutletName;
+        private final TextView tvDate, tvDow, tvOutletName, tvOutletBanglaName, tvOutletAddress;
         private final RecyclerView recyclerView;
         private final ProgressBar progressBar;
         private final LinearLayout buttonView;
@@ -113,7 +146,10 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
         public OrderedOutletAdapterViewHolder(@NonNull View itemView) {
             super(itemView);
             tvDate = itemView.findViewById(R.id.tvDate);
+            tvDow = itemView.findViewById(R.id.tvDow);
             tvOutletName = itemView.findViewById(R.id.tvOutletName);
+            tvOutletBanglaName = itemView.findViewById(R.id.tvOutletBanglaName);
+            tvOutletAddress = itemView.findViewById(R.id.tvOutletAddress);
             recyclerView = itemView.findViewById(R.id.recyclerView);
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             tvTotalAmount = itemView.findViewById(R.id.tvTotalAmount);
@@ -150,9 +186,13 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
             sumNetOrder += item.getNetAmount();
         }
 
-        holder.tvTotalAmount.setText(formatDouble(sumAmount));
-        holder.tvTotalDiscount.setText(formatDouble(sumDiscount));
-        holder.tvNetAmount.setText(formatDouble(sumNetOrder));
+        outlet.setTotalAmount(sumAmount);
+        outlet.setTotalDiscount(sumDiscount);
+        outlet.setNetAmount(sumNetOrder);
+
+        holder.tvTotalAmount.setText(formatDouble(outlet.getTotalAmount()));
+        holder.tvTotalDiscount.setText(formatDouble(outlet.getTotalDiscount()));
+        holder.tvNetAmount.setText(formatDouble(outlet.getNetAmount()));
 
     }
 
@@ -164,6 +204,214 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
         } catch (NumberFormatException e) {
             return 0;
         }
+    }
+
+    //************************************************************************************
+    private void submitDelivery(int position, double damageAmount, double commissionAmount, double cashAmount) {
+        OrderedOutlet outlet = orderedOutlets.get(position);
+        outlet.setLoading(true);
+        notifyItemChanged(position);
+
+        if (position < 0 || position >= orderedOutlets.size()) return;
+
+        JSONArray jsonArray = new JSONArray();
+        for (OrderedProduct item : outlet.getOrderedProducts()) {
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("db_id", outlet.getDbId());
+                jsonObject.put("user_id", outlet.getUserId());
+                jsonObject.put("product_id", item.getProductId());
+                jsonObject.put("outlet_id", outlet.getOutletId());
+                jsonObject.put("quantity", item.getQuantity());
+                jsonObject.put("rate", item.getTp());
+                jsonObject.put("discount", item.getDiscount());
+                jsonObject.put("route_name", outlet.getRouteName());
+                jsonObject.put("date", outlet.getDate());
+                jsonObject.put("business", outlet.getBusiness());
+                jsonObject.put("damage_amount", damageAmount);
+                jsonObject.put("commission_amount", commissionAmount);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+            jsonArray.put(jsonObject);
+        }
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.POST, ApiServices.submitDelivery, jsonArray, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                try {
+                    JSONObject jsonObject = response.getJSONObject(0);
+                    String type = jsonObject.getString("result");
+                    ToastInstance.getInstance(context).setToast(type);
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+                if (position < orderedOutlets.size()) {
+                    orderedOutlets.remove(position);
+                    notifyItemRemoved(position);
+                    //listener.onItemClick(position);  // Optional, only if needed elsewhere
+                }
+
+                if (orderedOutlets.isEmpty()) {
+                    ((AppCompatActivity) context).getSupportFragmentManager().popBackStack();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                orderedOutlets.get(position).setLoading(false);
+                notifyItemChanged(position);
+                ToastInstance.getInstance(context).setToast("Network error");
+            }
+        });
+        VolleyInstance.getVolleyInstance(context).addToRequestQueue(jsonArrayRequest);
+    }
+
+    //************************************************************************************
+    private void dialogConfirmPaidDelivered(int position) {
+        if (alertDialog == null || !alertDialog.isShowing()) {
+            View view = LayoutInflater.from(context).inflate(R.layout.dialog_confirm, null);
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setView(view);
+
+            TextView tvName = view.findViewById(R.id.tvName);
+            TextInputLayout tilDamageAmount = view.findViewById(R.id.tilDamageAmount);
+            TextInputEditText edDamageAmount = view.findViewById(R.id.edDamageAmount);
+            TextInputLayout tilCommissionAmount = view.findViewById(R.id.tilCommissionAmount);
+            TextInputEditText edCommissionAmount = view.findViewById(R.id.edCommissionAmount);
+            Button buttonYes = view.findViewById(R.id.buttonYes);
+            Button buttonNo = view.findViewById(R.id.buttonNo);
+
+            tvName.setText("Are you sure\n" + orderedOutlets.get(position).getOutletName() + "\nsuccessfully delivered ?");
+
+            tilDamageAmount.setVisibility(VISIBLE);
+            tilCommissionAmount.setVisibility(VISIBLE);
+
+            alertDialog = builder.create();
+
+            buttonYes.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    hideKeyboard(v);
+                    alertDialog.cancel();
+                    String damage = edDamageAmount.getText().toString();
+                    String commission = edCommissionAmount.getText().toString();
+                    double cashAmount = orderedOutlets.get(position).getNetAmount() - (Double.parseDouble(damage) + Double.parseDouble(commission));
+                    if (damage.isEmpty() && !commission.isEmpty()){
+                        submitDelivery(position,0, Double.parseDouble(commission), cashAmount);
+                    } else if (commission.isEmpty() && !damage.isEmpty()){
+                        submitDelivery(position, Double.parseDouble(damage), 0, cashAmount);
+                    }
+                }
+            });
+
+            buttonNo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    alertDialog.cancel();
+                }
+            });
+
+            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            alertDialog.show();
+
+        }
+
+
+    }
+    //************************************************************************************
+    private void dialogConfirmDueDelivered(int position) {
+        if (alertDialog == null || !alertDialog.isShowing()) {
+            View view = LayoutInflater.from(context).inflate(R.layout.dialog_confirm, null);
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setView(view);
+
+            TextView tvName = view.findViewById(R.id.tvName);
+            TextInputLayout tilDamageAmount = view.findViewById(R.id.tilDamageAmount);
+            TextInputEditText edDamageAmount = view.findViewById(R.id.edDamageAmount);
+            TextInputLayout tilCommissionAmount = view.findViewById(R.id.tilCommissionAmount);
+            TextInputEditText edCommissionAmount = view.findViewById(R.id.edCommissionAmount);
+            TextInputLayout tilCashAmount = view.findViewById(R.id.tilCashAmount);
+            TextInputEditText edCashAmount = view.findViewById(R.id.edCashAmount);
+            Button buttonYes = view.findViewById(R.id.buttonYes);
+            Button buttonNo = view.findViewById(R.id.buttonNo);
+
+            tvName.setText("Are you sure\n" + orderedOutlets.get(position).getOutletName() + "\nsuccessfully delivered ?");
+
+            tilDamageAmount.setVisibility(VISIBLE);
+            tilCommissionAmount.setVisibility(VISIBLE);
+            tilCashAmount.setVisibility(VISIBLE);
+
+            alertDialog = builder.create();
+
+            buttonYes.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    hideKeyboard(v);
+                    alertDialog.cancel();
+                    String damage = edDamageAmount.getText().toString();
+                    String commission = edCommissionAmount.getText().toString();
+                    String cash = edCashAmount.getText().toString();
+                    if (damage.isEmpty() && !commission.isEmpty() && !cash.isEmpty()){
+                        submitDelivery(position,0, Double.parseDouble(commission), Integer.parseInt(cash));
+                    } else if (commission.isEmpty() && !damage.isEmpty() && !cash.isEmpty()){
+                        submitDelivery(position, Double.parseDouble(damage), 0, Integer.parseInt(cash));
+                    } else if (cash.isEmpty() && !damage.isEmpty() && !commission.isEmpty()){
+                        submitDelivery(position, Double.parseDouble(damage), Double.parseDouble(commission), 0);
+                    }
+                }
+            });
+
+            buttonNo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    alertDialog.cancel();
+                }
+            });
+
+            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            alertDialog.show();
+
+        }
+
+
+    }
+
+    //************************************************************************************
+    private void dialogConfirmCancelled(int position) {
+        if (alertDialog == null || !alertDialog.isShowing()) {
+            View view = LayoutInflater.from(context).inflate(R.layout.dialog_confirm, null);
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setView(view);
+
+            TextView tvName = view.findViewById(R.id.tvName);
+            Button buttonYes = view.findViewById(R.id.buttonYes);
+            Button buttonNo = view.findViewById(R.id.buttonNo);
+
+            tvName.setText("Are you sure the delivery to\n" + orderedOutlets.get(position).getOutletName() + "\nwas not successful ?");
+
+            alertDialog = builder.create();
+
+            buttonYes.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    alertDialog.cancel();
+                    cancelOrder(position);
+                }
+            });
+
+            buttonNo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    alertDialog.cancel();
+                }
+            });
+
+            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            alertDialog.show();
+
+        }
+
     }
 
     //************************************************************************************
@@ -215,41 +463,9 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
     }
 
     //************************************************************************************
-    private void dialogConfirmCancelled(int position) {
-        if (alertDialog == null || !alertDialog.isShowing()) {
-            View view = LayoutInflater.from(context).inflate(R.layout.dialog_confirm, null);
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setView(view);
-
-            TextView tvName = view.findViewById(R.id.tvName);
-            Button buttonYes = view.findViewById(R.id.buttonYes);
-            Button buttonNo = view.findViewById(R.id.buttonNo);
-
-            tvName.setText("Are you sure " + orderedOutlets.get(position).getOutletName() + " did not deliver successfully ?");
-
-            alertDialog = builder.create();
-
-            buttonYes.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    alertDialog.cancel();
-                    cancelOrder(position);
-                }
-            });
-
-            buttonNo.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    alertDialog.cancel();
-                }
-            });
-
-            alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            alertDialog.show();
-
-        }
-
-
+    public void hideKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
 }

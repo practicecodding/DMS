@@ -28,6 +28,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
+                android:fontFamily="sans-serif"
                 android:gravity="left"
                 android:text="04-05-2025"
                 android:textColor="@color/black"
@@ -35,13 +36,14 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tvStatus"
+                android:id="@+id/tvDow"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
+                android:fontFamily="sans-serif"
                 android:gravity="right"
-                android:text="On Transit"
+                android:text="Sunday"
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -59,6 +61,28 @@
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvOutletBanglaName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:gravity="left"
+            android:text="Demo Bangla Name"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvOutletAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:gravity="left"
+            android:text="Demo Address"
+            android:textSize="14sp" />
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -137,8 +161,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clipToPadding="false"
-            android:scrollbars="none"
-            android:descendantFocusability="afterDescendants"/>
+            android:descendantFocusability="afterDescendants"
+            android:scrollbars="none" />
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
