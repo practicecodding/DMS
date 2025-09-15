@@ -199,6 +199,7 @@ public class OrderedProductAdapter extends RecyclerView.Adapter<OrderedProductAd
         }
     }
 
+    //************************************************************************************
     private double safeParseDouble(String value) {
         if (value == null || value.trim().isEmpty()) return 0;
         try {
