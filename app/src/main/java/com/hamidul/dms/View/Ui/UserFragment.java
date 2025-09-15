@@ -71,6 +71,7 @@ public class UserFragment extends Fragment {
         return myView;
     }
 
+    //************************************************************************************
     private void findViewById(View myView) {
         viewModel = new ViewModelProvider(this).get(DMSViewModel.class);
         progressBar = myView.findViewById(R.id.progressBar);
@@ -78,6 +79,7 @@ public class UserFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
+    //************************************************************************************
     @Override
     public void onResume() {
         super.onResume();

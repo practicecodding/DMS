@@ -12,7 +12,7 @@ public class OrderedProduct implements Parcelable {
     private String quantity, discount;
     private double totalAmount, netAmount;
 
-    public OrderedProduct() {
+    private OrderedProduct() {
     }
 
     protected OrderedProduct(Parcel in) {

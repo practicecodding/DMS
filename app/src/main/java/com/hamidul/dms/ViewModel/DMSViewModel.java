@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import com.hamidul.dms.Service.Model.OrderedOutlet;
+import com.hamidul.dms.Service.Model.Report;
 import com.hamidul.dms.Service.Model.User;
 import com.hamidul.dms.Service.Repository.DMSRepository;
 import com.hamidul.dms.Service.Repository.Resource;
@@ -30,5 +31,10 @@ public class DMSViewModel extends AndroidViewModel implements ViewModelImpl {
     @Override
     public LiveData<Resource<ArrayList<OrderedOutlet>>> getOrderedOutlets(User user) {
         return repository.getOrderedOutlets(user);
+    }
+
+    @Override
+    public LiveData<Resource<Report>> getReport() {
+        return repository.getReport();
     }
 }

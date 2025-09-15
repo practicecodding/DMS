@@ -9,7 +9,9 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.hamidul.dms.Service.Model.OrderedOutlet;
+import com.hamidul.dms.Service.Model.Report;
 import com.hamidul.dms.Service.Model.User;
 import com.hamidul.dms.Service.Network.ApiServices;
 import com.hamidul.dms.Service.Network.VolleyInstance;
@@ -41,7 +43,6 @@ public class DMSRepository implements RepositoryImpl {
             @Override
             public void onResponse(JSONArray response) {
                 ArrayList<User> users = new ArrayList<>();
-
                 try {
                     for (int i = 0; i < response.length(); i++) {
                         JSONObject object = response.getJSONObject(i);
@@ -103,6 +104,33 @@ public class DMSRepository implements RepositoryImpl {
         });
 
         VolleyInstance.getVolleyInstance(ctx).addToRequestQueue(jsonArrayRequest);
+
+        return liveData;
+    }
+
+    @Override
+    public LiveData<Resource<Report>> getReport() {
+        MutableLiveData<Resource<Report>> liveData = new MutableLiveData<>();
+
+        liveData.setValue(Resource.loading(null));
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, ApiServices.getReport, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                try {
+                    JSONObject object = new JSONObject(s);
+                    liveData.setValue(Resource.success(Report.fromJson(object)));
+                } catch (JSONException e) {
+                    liveData.setValue(Resource.error("Parse error", null));
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                liveData.setValue(Resource.error("Network error", null));
+            }
+        });
+
+        VolleyInstance.getVolleyInstance(ctx).addToRequestQueue(stringRequest);
 
         return liveData;
     }

@@ -6,4 +6,5 @@ public interface ApiServices {
     String getOrderedOutlet = BASE_URL + "SMH_Durbeen/Admin/view_ordered_user_outlet_wise.php";
     String submitDelivery = BASE_URL + "SMH_Durbeen/DMS/insert_delivery.php";
     String cancelOrder = BASE_URL + "SMH_Durbeen/Admin/cancel_order.php";
+    String getReport = BASE_URL + "SMH_Durbeen/DMS/view_report_day_wise.php";
 }

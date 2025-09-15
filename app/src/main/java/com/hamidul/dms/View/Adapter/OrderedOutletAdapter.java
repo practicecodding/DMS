@@ -307,7 +307,6 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
                     double commissionAmount = safeParseDouble(edCommissionAmount.getText().toString());
                     double sumDamageCommissionAmount =  damageAmount+ commissionAmount;
                     double cashAmount = orderedOutlets.get(position).getNetAmount() - sumDamageCommissionAmount;
-                    ToastInstance.getInstance(context).setToast("Damage : "+damageAmount+"\nCommission : "+commissionAmount+"\nCash : "+cashAmount);
                     submitDelivery(position, damageAmount, commissionAmount, cashAmount);
                 }
             });
@@ -337,8 +336,6 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
             TextView tvName = view.findViewById(R.id.tvName);
             TextInputLayout tilDamageAmount = view.findViewById(R.id.tilDamageAmount);
             TextInputEditText edDamageAmount = view.findViewById(R.id.edDamageAmount);
-            TextInputLayout tilCommissionAmount = view.findViewById(R.id.tilCommissionAmount);
-            TextInputEditText edCommissionAmount = view.findViewById(R.id.edCommissionAmount);
             TextInputLayout tilCashAmount = view.findViewById(R.id.tilCashAmount);
             TextInputEditText edCashAmount = view.findViewById(R.id.edCashAmount);
             Button buttonYes = view.findViewById(R.id.buttonYes);
@@ -347,11 +344,9 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
             tvName.setText("Are you sure\n" + orderedOutlets.get(position).getOutletName() + "\nsuccessfully delivered ?");
 
             tilDamageAmount.setVisibility(VISIBLE);
-            tilCommissionAmount.setVisibility(VISIBLE);
             tilCashAmount.setVisibility(VISIBLE);
 
             edDamageAmount.addTextChangedListener(watcher);
-            edCommissionAmount.addTextChangedListener(watcher);
             edCashAmount.addTextChangedListener(watcher);
 
             alertDialog = builder.create();
@@ -362,9 +357,8 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
                     hideKeyboard(v);
                     alertDialog.cancel();
                     double damageAmount = safeParseDouble(edDamageAmount.getText().toString());
-                    double commissionAmount = safeParseDouble(edCommissionAmount.getText().toString());
                     double cashAmount = safeParseDouble(edCashAmount.getText().toString());
-                    submitDelivery(position, damageAmount, commissionAmount, cashAmount);
+                    submitDelivery(position, damageAmount, 0, cashAmount);
                 }
             });
 

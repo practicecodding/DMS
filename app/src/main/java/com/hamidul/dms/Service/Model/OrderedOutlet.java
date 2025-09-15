@@ -24,7 +24,7 @@ public class OrderedOutlet implements Parcelable {
     private double netAmount;
     private boolean isLoading;
 
-    public OrderedOutlet() {
+    private OrderedOutlet() {
         this.orderedProducts = new ArrayList<>();
         this.isLoading = false;
     }
