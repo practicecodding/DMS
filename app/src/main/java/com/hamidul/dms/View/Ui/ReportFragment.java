@@ -4,31 +4,21 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 import android.os.Bundle;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.hamidul.dms.R;
 import com.hamidul.dms.Service.Model.Report;
-import com.hamidul.dms.Service.Model.User;
 import com.hamidul.dms.Service.Repository.Resource;
-import com.hamidul.dms.View.Adapter.UserAdapter;
 import com.hamidul.dms.View.Manager.ToastInstance;
 import com.hamidul.dms.ViewModel.DMSViewModel;
-
-import java.util.ArrayList;
-import java.util.Objects;
 
 public class ReportFragment extends Fragment {
     private ProgressBar progressBar;
@@ -58,9 +48,6 @@ public class ReportFragment extends Fragment {
                         tvTotalCommission.setText(formatDouble(report.getTotalCommission()));
                         tvTotalDue.setText(formatDouble(report.getTotalDue()));
                         tvTotalCash.setText(formatDouble(report.getTotalCash()));
-                    }
-                    else {
-                        ToastInstance.getInstance(getContext()).setToast("Today's delivery has not been submitted.");
                     }
                 } else {
                     progressBar.setVisibility(GONE);

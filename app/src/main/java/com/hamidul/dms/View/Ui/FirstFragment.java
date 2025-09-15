@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.hamidul.dms.R;
+import com.hamidul.dms.View.Manager.ToastInstance;
 
 import java.util.Objects;
 
@@ -35,7 +36,8 @@ public class FirstFragment extends Fragment {
         layoutCheckDelivery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                loadFragmentWithBackStack(new CheckDeliveryFragment());
+                //loadFragmentWithBackStack(new CheckDeliveryFragment());
+                ToastInstance.getInstance(getContext()).setToast("Coming soon");
             }
         });
 
