@@ -218,24 +218,28 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
 
         JSONArray jsonArray = new JSONArray();
         for (OrderedProduct item : outlet.getOrderedProducts()) {
-            JSONObject jsonObject = new JSONObject();
-            try {
-                jsonObject.put("db_id", outlet.getDbId());
-                jsonObject.put("user_id", outlet.getUserId());
-                jsonObject.put("product_id", item.getProductId());
-                jsonObject.put("outlet_id", outlet.getOutletId());
-                jsonObject.put("quantity", item.getQuantity());
-                jsonObject.put("rate", item.getTp());
-                jsonObject.put("discount", item.getDiscount());
-                jsonObject.put("route_name", outlet.getRouteName());
-                jsonObject.put("date", outlet.getDate());
-                jsonObject.put("business", outlet.getBusiness());
-                jsonObject.put("damage_amount", damageAmount);
-                jsonObject.put("commission_amount", commissionAmount);
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
+            if (!item.getQuantity().isEmpty()){
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("db_id", outlet.getDbId());
+                    jsonObject.put("user_id", outlet.getUserId());
+                    jsonObject.put("product_id", item.getProductId());
+                    jsonObject.put("outlet_id", outlet.getOutletId());
+                    jsonObject.put("quantity", item.getQuantity());
+                    jsonObject.put("rate", item.getTp());
+                    jsonObject.put("discount", item.getDiscount());
+                    jsonObject.put("route_name", outlet.getRouteName());
+                    jsonObject.put("date", outlet.getDate());
+                    jsonObject.put("business", outlet.getBusiness());
+                    jsonObject.put("net_delivery_amount", outlet.getNetAmount());
+                    jsonObject.put("damage_amount", damageAmount);
+                    jsonObject.put("commission_amount", commissionAmount);
+                    jsonObject.put("cash_amount", cashAmount);
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+                jsonArray.put(jsonObject);
             }
-            jsonArray.put(jsonObject);
         }
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.POST, ApiServices.submitDelivery, jsonArray, new Response.Listener<JSONArray>() {
             @Override
@@ -299,14 +303,12 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
                 public void onClick(View v) {
                     hideKeyboard(v);
                     alertDialog.cancel();
-                    String damage = edDamageAmount.getText().toString();
-                    String commission = edCommissionAmount.getText().toString();
-                    double cashAmount = orderedOutlets.get(position).getNetAmount() - (Double.parseDouble(damage) + Double.parseDouble(commission));
-                    if (damage.isEmpty() && !commission.isEmpty()){
-                        submitDelivery(position,0, Double.parseDouble(commission), cashAmount);
-                    } else if (commission.isEmpty() && !damage.isEmpty()){
-                        submitDelivery(position, Double.parseDouble(damage), 0, cashAmount);
-                    }
+                    double damageAmount = safeParseDouble(edDamageAmount.getText().toString());
+                    double commissionAmount = safeParseDouble(edCommissionAmount.getText().toString());
+                    double sumDamageCommissionAmount =  damageAmount+ commissionAmount;
+                    double cashAmount = orderedOutlets.get(position).getNetAmount() - sumDamageCommissionAmount;
+                    ToastInstance.getInstance(context).setToast("Damage : "+damageAmount+"\nCommission : "+commissionAmount+"\nCash : "+cashAmount);
+                    submitDelivery(position, damageAmount, commissionAmount, cashAmount);
                 }
             });
 
@@ -324,6 +326,7 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
 
 
     }
+
     //************************************************************************************
     private void dialogConfirmDueDelivered(int position) {
         if (alertDialog == null || !alertDialog.isShowing()) {
@@ -358,16 +361,10 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
                 public void onClick(View v) {
                     hideKeyboard(v);
                     alertDialog.cancel();
-                    String damage = edDamageAmount.getText().toString();
-                    String commission = edCommissionAmount.getText().toString();
-                    String cash = edCashAmount.getText().toString();
-                    if (damage.isEmpty() && !commission.isEmpty() && !cash.isEmpty()){
-                        submitDelivery(position,0, Double.parseDouble(commission), Integer.parseInt(cash));
-                    } else if (commission.isEmpty() && !damage.isEmpty() && !cash.isEmpty()){
-                        submitDelivery(position, Double.parseDouble(damage), 0, Integer.parseInt(cash));
-                    } else if (cash.isEmpty() && !damage.isEmpty() && !commission.isEmpty()){
-                        submitDelivery(position, Double.parseDouble(damage), Double.parseDouble(commission), 0);
-                    }
+                    double damageAmount = safeParseDouble(edDamageAmount.getText().toString());
+                    double commissionAmount = safeParseDouble(edCommissionAmount.getText().toString());
+                    double cashAmount = safeParseDouble(edCashAmount.getText().toString());
+                    submitDelivery(position, damageAmount, commissionAmount, cashAmount);
                 }
             });
 
@@ -495,6 +492,7 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
 
         }
     };
+
     //************************************************************************************
     public void hideKeyboard(View view) {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
