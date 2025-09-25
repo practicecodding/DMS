@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import com.hamidul.dms.Service.Model.DateWiseSummary;
 import com.hamidul.dms.Service.Model.OrderedOutlet;
 import com.hamidul.dms.Service.Model.Report;
 import com.hamidul.dms.Service.Model.User;
@@ -36,5 +37,10 @@ public class DMSViewModel extends AndroidViewModel implements ViewModelImpl {
     @Override
     public LiveData<Resource<Report>> getReport() {
         return repository.getReport();
+    }
+
+    @Override
+    public LiveData<Resource<ArrayList<DateWiseSummary>>> getDailyOrderSummary() {
+        return repository.getDailyOrderSummary();
     }
 }

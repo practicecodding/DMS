@@ -10,6 +10,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.hamidul.dms.Service.Model.DateWiseSummary;
 import com.hamidul.dms.Service.Model.OrderedOutlet;
 import com.hamidul.dms.Service.Model.Report;
 import com.hamidul.dms.Service.Model.User;
@@ -131,6 +132,40 @@ public class DMSRepository implements RepositoryImpl {
         });
 
         VolleyInstance.getVolleyInstance(ctx).addToRequestQueue(stringRequest);
+
+        return liveData;
+    }
+
+    @Override
+    public LiveData<Resource<ArrayList<DateWiseSummary>>> getDailyOrderSummary() {
+        MutableLiveData<Resource<ArrayList<DateWiseSummary>>> liveData = new MutableLiveData<>();
+
+        liveData.setValue(Resource.loading(null));
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.POST, ApiServices.getDailyOrderSummary, null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                ArrayList<DateWiseSummary> summaries = new ArrayList<>();
+
+                try {
+                    for (int i = 0; i < response.length(); i++) {
+                        JSONObject object = response.getJSONObject(i);
+                        summaries.add(DateWiseSummary.fromJson(object));
+                    }
+                    liveData.setValue(Resource.success(summaries));
+
+                } catch (JSONException e) {
+                    liveData.setValue(Resource.error("Parse error", null));
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                liveData.setValue(Resource.error("Network error", null));
+            }
+        });
+
+        VolleyInstance.getVolleyInstance(ctx).addToRequestQueue(jsonArrayRequest);
 
         return liveData;
     }
