@@ -12,7 +12,7 @@ public class Report {
     private Report() {
     }
 
-    public static Report fromJson(JSONObject object){
+    public static Report fromJson(JSONObject object) {
         Report report = new Report();
         report.totalNetAmount = object.optDouble("total_amount");
         report.totalDamage = object.optDouble("total_damage");

@@ -10,12 +10,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.hamidul.dms.R;
-import com.hamidul.dms.View.Manager.ToastInstance;
-
-import java.util.Objects;
 
 public class FirstFragment extends Fragment {
-    LinearLayout layoutOnTransitOrder, layoutCheckDelivery, layoutReport;
+    LinearLayout layoutOnTransitOrder, layoutDailyOrderSummary, layoutReport;
 
     public FirstFragment() {
 
@@ -33,11 +30,10 @@ public class FirstFragment extends Fragment {
             }
         });
 
-        layoutCheckDelivery.setOnClickListener(new View.OnClickListener() {
+        layoutDailyOrderSummary.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //loadFragmentWithBackStack(new CheckDeliveryFragment());
-                ToastInstance.getInstance(getContext()).setToast("Coming soon");
+                loadFragmentWithBackStack(new DailyOrderSummaryFragment());
             }
         });
 
@@ -53,7 +49,7 @@ public class FirstFragment extends Fragment {
 
     private void findViewById(View myView) {
         layoutOnTransitOrder = myView.findViewById(R.id.layoutOnTransitOrder);
-        layoutCheckDelivery = myView.findViewById(R.id.layoutCheckDelivery);
+        layoutDailyOrderSummary = myView.findViewById(R.id.layoutDailyOrderSummary);
         layoutReport = myView.findViewById(R.id.layoutReport);
     }
 

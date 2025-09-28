@@ -4,7 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class Resource<T> {
-    public enum Status { SUCCESS, ERROR, LOADING }
+    public enum Status {SUCCESS, ERROR, LOADING}
+
     @NonNull
     public final Status status;
     @Nullable

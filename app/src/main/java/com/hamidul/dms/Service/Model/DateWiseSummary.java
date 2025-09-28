@@ -6,10 +6,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class DateWiseSummary {
-    String date;
-    ArrayList<ProductSummary> productSummaries;
-    boolean isShowing;
-    boolean isShowingDetails;
+    private String date;
+    private ArrayList<ProductSummary> productSummaries;
+    private boolean isShowing;
+    private boolean isShowingDetails;
 
     public DateWiseSummary() {
         this.productSummaries = new ArrayList<>();

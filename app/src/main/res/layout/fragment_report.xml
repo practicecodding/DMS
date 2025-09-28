@@ -178,7 +178,7 @@
                         android:layout_weight="2"
                         android:fontFamily="sans-serif-medium"
                         android:gravity="left"
-                        android:text="Total Total Due"
+                        android:text="Total Due"
                         android:textColor="#00BCD4"
                         android:textSize="18sp" />
 

@@ -7,10 +7,11 @@ import android.widget.EditText;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-public class KeyboardVisibilityHelper implements ViewTreeObserver.OnGlobalLayoutListener{
+public class KeyboardVisibilityHelper implements ViewTreeObserver.OnGlobalLayoutListener {
     private final View rootView;
     private final RecyclerView recyclerView;
     private final OnKeyboardVisibilityListener listener;
+
     public interface OnKeyboardVisibilityListener {
         void onKeyboardVisibilityChanged(boolean visible, int keyboardHeight);
     }
@@ -21,6 +22,7 @@ public class KeyboardVisibilityHelper implements ViewTreeObserver.OnGlobalLayout
         this.listener = listener;
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(this);
     }
+
     @Override
     public void onGlobalLayout() {
         Rect r = new Rect();

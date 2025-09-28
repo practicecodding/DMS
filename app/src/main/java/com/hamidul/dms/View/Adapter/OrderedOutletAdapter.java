@@ -218,7 +218,7 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
 
         JSONArray jsonArray = new JSONArray();
         for (OrderedProduct item : outlet.getOrderedProducts()) {
-            if (!item.getQuantity().isEmpty()){
+            if (!item.getQuantity().isEmpty()) {
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject.put("db_id", outlet.getDbId());
@@ -281,6 +281,7 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
             builder.setView(view);
 
             TextView tvName = view.findViewById(R.id.tvName);
+            TextView tvNetAmount = view.findViewById(R.id.tvNetAmount);
             TextInputLayout tilDamageAmount = view.findViewById(R.id.tilDamageAmount);
             TextInputEditText edDamageAmount = view.findViewById(R.id.edDamageAmount);
             TextInputLayout tilCommissionAmount = view.findViewById(R.id.tilCommissionAmount);
@@ -290,11 +291,42 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
 
             tvName.setText("Are you sure\n" + orderedOutlets.get(position).getOutletName() + "\nsuccessfully delivered ?");
 
+            tvNetAmount.setText(String.format("Cash Amount : %,.0f", orderedOutlets.get(position).getNetAmount()));
             tilDamageAmount.setVisibility(VISIBLE);
             tilCommissionAmount.setVisibility(VISIBLE);
 
-            edDamageAmount.addTextChangedListener(watcher);
-            edCommissionAmount.addTextChangedListener(watcher);
+            TextWatcher paidWatcher = new TextWatcher() {
+                @Override
+                public void afterTextChanged(Editable editable) {
+
+                    String s = editable.toString().trim();
+
+                    if (!s.isEmpty() && s.startsWith("0")) {
+                        editable.delete(0, 1);
+                    }
+
+                }
+
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                    double damageAmount = safeParseDouble(edDamageAmount.getText().toString());
+                    double commissionAmount = safeParseDouble(edCommissionAmount.getText().toString());
+                    double sumDamageCommissionAmount = damageAmount + commissionAmount;
+                    double cashAmount = orderedOutlets.get(position).getNetAmount() - sumDamageCommissionAmount;
+
+                    tvNetAmount.setText(String.format("Cash Amount : %,.0f", cashAmount));
+
+                }
+            };
+
+            edDamageAmount.addTextChangedListener(paidWatcher);
+            edCommissionAmount.addTextChangedListener(paidWatcher);
 
             alertDialog = builder.create();
 
@@ -305,7 +337,7 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
                     alertDialog.cancel();
                     double damageAmount = safeParseDouble(edDamageAmount.getText().toString());
                     double commissionAmount = safeParseDouble(edCommissionAmount.getText().toString());
-                    double sumDamageCommissionAmount =  damageAmount+ commissionAmount;
+                    double sumDamageCommissionAmount = damageAmount + commissionAmount;
                     double cashAmount = orderedOutlets.get(position).getNetAmount() - sumDamageCommissionAmount;
                     submitDelivery(position, damageAmount, commissionAmount, cashAmount);
                 }
@@ -334,6 +366,7 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
             builder.setView(view);
 
             TextView tvName = view.findViewById(R.id.tvName);
+            TextView tvNetAmount = view.findViewById(R.id.tvNetAmount);
             TextInputLayout tilDamageAmount = view.findViewById(R.id.tilDamageAmount);
             TextInputEditText edDamageAmount = view.findViewById(R.id.edDamageAmount);
             TextInputLayout tilCashAmount = view.findViewById(R.id.tilCashAmount);
@@ -343,11 +376,42 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
 
             tvName.setText("Are you sure\n" + orderedOutlets.get(position).getOutletName() + "\nsuccessfully delivered ?");
 
+            tvNetAmount.setText(String.format("Due Amount : %,.0f", orderedOutlets.get(position).getNetAmount()));
             tilDamageAmount.setVisibility(VISIBLE);
             tilCashAmount.setVisibility(VISIBLE);
 
-            edDamageAmount.addTextChangedListener(watcher);
-            edCashAmount.addTextChangedListener(watcher);
+            TextWatcher dueWatcher = new TextWatcher() {
+                @Override
+                public void afterTextChanged(Editable editable) {
+
+                    String s = editable.toString().trim();
+
+                    if (!s.isEmpty() && s.startsWith("0")) {
+                        editable.delete(0, 1);
+                    }
+
+                }
+
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                    double damageAmount = safeParseDouble(edDamageAmount.getText().toString());
+                    double cashAmount = safeParseDouble(edCashAmount.getText().toString());
+                    double sumDamageCashAmount = damageAmount + cashAmount;
+                    double dueAmount = orderedOutlets.get(position).getNetAmount() - sumDamageCashAmount;
+
+                    tvNetAmount.setText(String.format("Due Amount : %,.0f", dueAmount));
+
+                }
+            };
+
+            edDamageAmount.addTextChangedListener(dueWatcher);
+            edCashAmount.addTextChangedListener(dueWatcher);
 
             alertDialog = builder.create();
 
@@ -463,7 +527,7 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
     }
 
     //************************************************************************************
-    private TextWatcher watcher = new TextWatcher() {
+    /*private final TextWatcher watcher = new TextWatcher() {
         @Override
         public void afterTextChanged(Editable editable) {
 
@@ -485,7 +549,7 @@ public class OrderedOutletAdapter extends RecyclerView.Adapter<OrderedOutletAdap
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
         }
-    };
+    };*/
 
     //************************************************************************************
     public void hideKeyboard(View view) {
