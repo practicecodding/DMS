@@ -38,13 +38,32 @@ public class DMSRepository implements RepositoryImpl {
     @Override
     public LiveData<Resource<ArrayList<User>>> getUsers() {
         MutableLiveData<Resource<ArrayList<User>>> liveData = new MutableLiveData<>();
-        liveData.setValue(Resource.loading(null));
 
+        liveData.setValue(Resource.loading());
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.POST, ApiServices.getUser, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 ArrayList<User> users = new ArrayList<>();
-                try {
+                boolean hasError = false;
+
+                for (int i = 0; i < response.length(); i++){
+                    try {
+                        JSONObject object = response.getJSONObject(i);
+                        users.add(User.fromJson(object));
+                    } catch (JSONException e) {
+                        hasError = true;
+                    }
+                }
+
+                if (users.isEmpty()){
+                    liveData.setValue(Resource.empty());
+                } else if (hasError) {
+                    liveData.setValue(Resource.error("Some items failed to parse"));
+                } else {
+                    liveData.setValue(Resource.success(users));
+                }
+
+                /*try {
                     for (int i = 0; i < response.length(); i++) {
                         JSONObject object = response.getJSONObject(i);
                         users.add(User.fromJson(object));
@@ -53,13 +72,13 @@ public class DMSRepository implements RepositoryImpl {
 
                 } catch (JSONException e) {
                     liveData.setValue(Resource.error("Parse error", null));
-                }
+                }*/
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                liveData.setValue(Resource.error("Network error", null));
+                liveData.setValue(Resource.error("Network error"));
             }
         });
 
@@ -71,7 +90,8 @@ public class DMSRepository implements RepositoryImpl {
     @Override
     public LiveData<Resource<ArrayList<OrderedOutlet>>> getOrderedOutlets(User user) {
         MutableLiveData<Resource<ArrayList<OrderedOutlet>>> liveData = new MutableLiveData<>();
-        liveData.setValue(Resource.loading(null));
+
+        liveData.setValue(Resource.loading());
         JSONArray jsonArray = new JSONArray();
         JSONObject jsonObject = new JSONObject();
         try {
@@ -84,8 +104,26 @@ public class DMSRepository implements RepositoryImpl {
             @Override
             public void onResponse(JSONArray response) {
                 ArrayList<OrderedOutlet> outlets = new ArrayList<>();
+                boolean hasError = false;
 
-                try {
+                for (int i = 0; i < response.length(); i++){
+                    try {
+                        JSONObject object = response.getJSONObject(i);
+                        outlets.add(OrderedOutlet.fromJson(object));
+                    } catch (JSONException e) {
+                        hasError = true;
+                    }
+                }
+
+                if (outlets.isEmpty()){
+                    liveData.setValue(Resource.empty());
+                } else if (hasError) {
+                    liveData.setValue(Resource.error("Some items failed to parse"));
+                } else {
+                    liveData.setValue(Resource.success(outlets));
+                }
+
+                /*try {
                     for (int i = 0; i < response.length(); i++) {
                         JSONObject object = response.getJSONObject(i);
                         outlets.add(OrderedOutlet.fromJson(object));
@@ -94,13 +132,13 @@ public class DMSRepository implements RepositoryImpl {
 
                 } catch (JSONException e) {
                     liveData.setValue(Resource.error("Parse error", null));
-                }
+                }*/
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                liveData.setValue(Resource.error("Network error", null));
+                liveData.setValue(Resource.error("Network error"));
             }
         });
 
@@ -113,21 +151,26 @@ public class DMSRepository implements RepositoryImpl {
     public LiveData<Resource<Report>> getReport() {
         MutableLiveData<Resource<Report>> liveData = new MutableLiveData<>();
 
-        liveData.setValue(Resource.loading(null));
+        liveData.setValue(Resource.loading());
         StringRequest stringRequest = new StringRequest(Request.Method.POST, ApiServices.getReport, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
+
                 try {
                     JSONObject object = new JSONObject(s);
-                    liveData.setValue(Resource.success(Report.fromJson(object)));
+                    if (object.length() == 0){
+                        liveData.setValue(Resource.empty());
+                    } else {
+                        liveData.setValue(Resource.success(Report.fromJson(object)));
+                    }
                 } catch (JSONException e) {
-                    liveData.setValue(Resource.error("Parse error", null));
+                    liveData.setValue(Resource.error("Parse error"));
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                liveData.setValue(Resource.error("Network error", null));
+                liveData.setValue(Resource.error("Network error"));
             }
         });
 
@@ -140,13 +183,30 @@ public class DMSRepository implements RepositoryImpl {
     public LiveData<Resource<ArrayList<DateWiseSummary>>> getDailyOrderSummary() {
         MutableLiveData<Resource<ArrayList<DateWiseSummary>>> liveData = new MutableLiveData<>();
 
-        liveData.setValue(Resource.loading(null));
+        liveData.setValue(Resource.loading());
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.POST, ApiServices.getDailyOrderSummary, null, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 ArrayList<DateWiseSummary> summaries = new ArrayList<>();
+                boolean hasError = false;
 
-                try {
+                for (int i = 0; i < response.length(); i++){
+                    try {
+                        JSONObject object = response.getJSONObject(i);
+                        summaries.add(DateWiseSummary.fromJson(object));
+                    } catch (JSONException e) {
+                        hasError = true;
+                    }
+                }
+
+                if (summaries.isEmpty()){
+                    liveData.setValue(Resource.empty());
+                } else if (hasError) {
+                    liveData.setValue(Resource.error("Some items failed to parse"));
+                } else {
+                    liveData.setValue(Resource.success(summaries));
+                }
+                /*try {
                     for (int i = 0; i < response.length(); i++) {
                         JSONObject object = response.getJSONObject(i);
                         summaries.add(DateWiseSummary.fromJson(object));
@@ -154,14 +214,14 @@ public class DMSRepository implements RepositoryImpl {
                     liveData.setValue(Resource.success(summaries));
 
                 } catch (JSONException e) {
-                    liveData.setValue(Resource.error("Parse error", null));
-                }
+                    liveData.setValue(Resource.error("Parse error"));
+                }*/
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                liveData.setValue(Resource.error("Network error", null));
+                liveData.setValue(Resource.error("Network error"));
             }
         });
 

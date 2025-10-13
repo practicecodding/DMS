@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class Resource<T> {
-    public enum Status {SUCCESS, ERROR, LOADING}
+    public enum Status {SUCCESS, EMPTY, ERROR, LOADING}
 
     @NonNull
     public final Status status;
@@ -23,12 +23,16 @@ public class Resource<T> {
         return new Resource<>(Status.SUCCESS, data, null);
     }
 
-    public static <T> Resource<T> error(String msg, @Nullable T data) {
-        return new Resource<>(Status.ERROR, data, msg);
+    public static <T> Resource<T> empty(){
+        return new Resource<>(Status.EMPTY, null, "No data to found.");
     }
 
-    public static <T> Resource<T> loading(@Nullable T data) {
-        return new Resource<>(Status.LOADING, data, null);
+    public static <T> Resource<T> error(String msg) {
+        return new Resource<>(Status.ERROR, null, msg);
+    }
+
+    public static <T> Resource<T> loading() {
+        return new Resource<>(Status.LOADING, null, null);
     }
 
 }

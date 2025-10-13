@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment;
 import com.hamidul.dms.R;
 
 public class FirstFragment extends Fragment {
-    LinearLayout layoutOnTransitOrder, layoutDailyOrderSummary, layoutReport;
+    private LinearLayout layoutOnTransitOrder, layoutDailyOrderSummary, layoutReport;
 
     public FirstFragment() {
 

@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-
+    //************************************************************************************
     public void setToolbarTitle(String title) {
         //MaterialToolbar toolbar = findViewById(R.id.materialToolbar);
         materialToolbar.setTitle(title);
