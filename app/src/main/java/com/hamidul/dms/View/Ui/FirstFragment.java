@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment;
 import com.hamidul.dms.R;
 
 public class FirstFragment extends Fragment {
-    private LinearLayout layoutOnTransitOrder, layoutDailyOrderSummary, layoutReport;
+    private LinearLayout layoutOnTransitOrder, layoutDailyOrderSummary, layoutOutletWiseReport, layoutReport;
 
     public FirstFragment() {
 
@@ -37,6 +37,13 @@ public class FirstFragment extends Fragment {
             }
         });
 
+        layoutOutletWiseReport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                loadFragmentWithBackStack(new DeliveredUserFragment());
+            }
+        });
+
         layoutReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -50,6 +57,7 @@ public class FirstFragment extends Fragment {
     private void findViewById(View myView) {
         layoutOnTransitOrder = myView.findViewById(R.id.layoutOnTransitOrder);
         layoutDailyOrderSummary = myView.findViewById(R.id.layoutDailyOrderSummary);
+        layoutOutletWiseReport = myView.findViewById(R.id.layoutOutletWiseReport);
         layoutReport = myView.findViewById(R.id.layoutReport);
     }
 

@@ -3,6 +3,7 @@ package com.hamidul.dms.Service.Repository;
 import androidx.lifecycle.LiveData;
 
 import com.hamidul.dms.Service.Model.DateWiseSummary;
+import com.hamidul.dms.Service.Model.DeliveredOutlet;
 import com.hamidul.dms.Service.Model.OrderedOutlet;
 import com.hamidul.dms.Service.Model.Report;
 import com.hamidul.dms.Service.Model.User;
@@ -17,4 +18,7 @@ public interface RepositoryImpl {
     LiveData<Resource<Report>> getReport();
 
     LiveData<Resource<ArrayList<DateWiseSummary>>> getDailyOrderSummary();
+
+    LiveData<Resource<ArrayList<User>>> getDeliveredUsers();
+    LiveData<Resource<ArrayList<DeliveredOutlet>>> getDeliveredOutlets(User user);
 }

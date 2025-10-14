@@ -11,11 +11,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.hamidul.dms.Service.Model.DateWiseSummary;
+import com.hamidul.dms.Service.Model.DeliveredOutlet;
 import com.hamidul.dms.Service.Model.OrderedOutlet;
 import com.hamidul.dms.Service.Model.Report;
 import com.hamidul.dms.Service.Model.User;
 import com.hamidul.dms.Service.Network.ApiServices;
 import com.hamidul.dms.Service.Network.VolleyInstance;
+import com.hamidul.dms.View.Manager.ToastInstance;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,7 +48,7 @@ public class DMSRepository implements RepositoryImpl {
                 ArrayList<User> users = new ArrayList<>();
                 boolean hasError = false;
 
-                for (int i = 0; i < response.length(); i++){
+                for (int i = 0; i < response.length(); i++) {
                     try {
                         JSONObject object = response.getJSONObject(i);
                         users.add(User.fromJson(object));
@@ -55,7 +57,7 @@ public class DMSRepository implements RepositoryImpl {
                     }
                 }
 
-                if (users.isEmpty()){
+                if (users.isEmpty()) {
                     liveData.setValue(Resource.empty());
                 } else if (hasError) {
                     liveData.setValue(Resource.error("Some items failed to parse"));
@@ -106,7 +108,7 @@ public class DMSRepository implements RepositoryImpl {
                 ArrayList<OrderedOutlet> outlets = new ArrayList<>();
                 boolean hasError = false;
 
-                for (int i = 0; i < response.length(); i++){
+                for (int i = 0; i < response.length(); i++) {
                     try {
                         JSONObject object = response.getJSONObject(i);
                         outlets.add(OrderedOutlet.fromJson(object));
@@ -115,7 +117,7 @@ public class DMSRepository implements RepositoryImpl {
                     }
                 }
 
-                if (outlets.isEmpty()){
+                if (outlets.isEmpty()) {
                     liveData.setValue(Resource.empty());
                 } else if (hasError) {
                     liveData.setValue(Resource.error("Some items failed to parse"));
@@ -155,14 +157,9 @@ public class DMSRepository implements RepositoryImpl {
         StringRequest stringRequest = new StringRequest(Request.Method.POST, ApiServices.getReport, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
-
                 try {
                     JSONObject object = new JSONObject(s);
-                    if (object.length() == 0){
-                        liveData.setValue(Resource.empty());
-                    } else {
-                        liveData.setValue(Resource.success(Report.fromJson(object)));
-                    }
+                    liveData.setValue(Resource.success(Report.fromJson(object)));
                 } catch (JSONException e) {
                     liveData.setValue(Resource.error("Parse error"));
                 }
@@ -190,7 +187,7 @@ public class DMSRepository implements RepositoryImpl {
                 ArrayList<DateWiseSummary> summaries = new ArrayList<>();
                 boolean hasError = false;
 
-                for (int i = 0; i < response.length(); i++){
+                for (int i = 0; i < response.length(); i++) {
                     try {
                         JSONObject object = response.getJSONObject(i);
                         summaries.add(DateWiseSummary.fromJson(object));
@@ -199,7 +196,7 @@ public class DMSRepository implements RepositoryImpl {
                     }
                 }
 
-                if (summaries.isEmpty()){
+                if (summaries.isEmpty()) {
                     liveData.setValue(Resource.empty());
                 } else if (hasError) {
                     liveData.setValue(Resource.error("Some items failed to parse"));
@@ -215,6 +212,118 @@ public class DMSRepository implements RepositoryImpl {
 
                 } catch (JSONException e) {
                     liveData.setValue(Resource.error("Parse error"));
+                }*/
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                liveData.setValue(Resource.error("Network error"));
+            }
+        });
+
+        VolleyInstance.getVolleyInstance(ctx).addToRequestQueue(jsonArrayRequest);
+
+        return liveData;
+    }
+
+    @Override
+    public LiveData<Resource<ArrayList<User>>> getDeliveredUsers() {
+        MutableLiveData<Resource<ArrayList<User>>> liveData = new MutableLiveData<>();
+
+        liveData.setValue(Resource.loading());
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.POST, ApiServices.getDeliveredUser, null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                ArrayList<User> users = new ArrayList<>();
+                boolean hasError = false;
+
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        JSONObject object = response.getJSONObject(i);
+                        users.add(User.fromJson(object));
+                    } catch (JSONException e) {
+                        hasError = true;
+                    }
+                }
+
+                if (users.isEmpty()) {
+                    liveData.setValue(Resource.empty());
+                } else if (hasError) {
+                    liveData.setValue(Resource.error("Some items failed to parse"));
+                } else {
+                    liveData.setValue(Resource.success(users));
+                }
+
+                /*try {
+                    for (int i = 0; i < response.length(); i++) {
+                        JSONObject object = response.getJSONObject(i);
+                        users.add(User.fromJson(object));
+                    }
+                    liveData.setValue(Resource.success(users));
+
+                } catch (JSONException e) {
+                    liveData.setValue(Resource.error("Parse error", null));
+                }*/
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                liveData.setValue(Resource.error("Network error"));
+            }
+        });
+
+        VolleyInstance.getVolleyInstance(ctx).addToRequestQueue(jsonArrayRequest);
+
+        return liveData;
+    }
+
+    @Override
+    public LiveData<Resource<ArrayList<DeliveredOutlet>>> getDeliveredOutlets(User user) {
+        MutableLiveData<Resource<ArrayList<DeliveredOutlet>>> liveData = new MutableLiveData<>();
+
+        liveData.setValue(Resource.loading());
+        JSONArray jsonArray = new JSONArray();
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("user_id", user.getId());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        jsonArray.put(jsonObject);
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.POST, ApiServices.getDeliveredOutlet, jsonArray, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                ArrayList<DeliveredOutlet> outlets = new ArrayList<>();
+                boolean hasError = false;
+
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        JSONObject object = response.getJSONObject(i);
+                        outlets.add(DeliveredOutlet.fromJson(object));
+                    } catch (JSONException e) {
+                        hasError = true;
+                    }
+                }
+
+                if (outlets.isEmpty()) {
+                    liveData.setValue(Resource.empty());
+                } else if (hasError) {
+                    liveData.setValue(Resource.error("Some items failed to parse"));
+                } else {
+                    liveData.setValue(Resource.success(outlets));
+                }
+
+                /*try {
+                    for (int i = 0; i < response.length(); i++) {
+                        JSONObject object = response.getJSONObject(i);
+                        outlets.add(OrderedOutlet.fromJson(object));
+                    }
+                    liveData.setValue(Resource.success(outlets));
+
+                } catch (JSONException e) {
+                    liveData.setValue(Resource.error("Parse error", null));
                 }*/
 
             }

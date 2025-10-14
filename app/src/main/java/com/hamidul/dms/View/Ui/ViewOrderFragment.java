@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 
 public class ViewOrderFragment extends Fragment {
     private View mainView;
+    private TextView tvNoDataToFound;
     private ProgressBar progressBar;
     private RecyclerView recyclerView;
     private OrderedOutletAdapter adapter;
@@ -118,16 +120,24 @@ public class ViewOrderFragment extends Fragment {
             @Override
             public void onChanged(Resource<ArrayList<OrderedOutlet>> resource) {
                 if (resource.status == Resource.Status.LOADING) {
+                    tvNoDataToFound.setVisibility(GONE);
                     progressBar.setVisibility(VISIBLE);
                     recyclerView.setVisibility(GONE);
+                } else if (resource.status == Resource.Status.EMPTY) {
+                    tvNoDataToFound.setVisibility(VISIBLE);
+                    progressBar.setVisibility(GONE);
+                    recyclerView.setVisibility(GONE);
                 } else if (resource.status == Resource.Status.SUCCESS) {
+                    tvNoDataToFound.setVisibility(GONE);
                     progressBar.setVisibility(GONE);
                     recyclerView.setVisibility(VISIBLE);
                     /*adapter = new OrderedOutletAdapter(getContext(), resource.data);
                     recyclerView.setAdapter(adapter);*/
                     adapter.updateList(resource.data);
                 } else {
-                    progressBar.setVisibility(GONE);
+                    tvNoDataToFound.setVisibility(GONE);
+                    progressBar.setVisibility(VISIBLE);
+                    recyclerView.setVisibility(GONE);
                     ToastInstance.getInstance(getContext()).setToast(resource.message);
                 }
             }
@@ -139,6 +149,7 @@ public class ViewOrderFragment extends Fragment {
     //************************************************************************************
     private void findViewById(View myView) {
         viewModel = new ViewModelProvider(this).get(DMSViewModel.class);
+        tvNoDataToFound = myView.findViewById(R.id.tvNoDataToFound);
         mainView = myView.findViewById(R.id.productView);
         progressBar = myView.findViewById(R.id.progressBar);
         recyclerView = myView.findViewById(R.id.recyclerView);

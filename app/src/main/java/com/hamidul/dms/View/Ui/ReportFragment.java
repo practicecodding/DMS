@@ -50,7 +50,7 @@ public class ReportFragment extends Fragment {
                         tvTotalCash.setText(formatDouble(report.getTotalCash()));
                     }
                 } else {
-                    progressBar.setVisibility(GONE);
+                    progressBar.setVisibility(VISIBLE);
                     ToastInstance.getInstance(getContext()).setToast(resource.message);
                 }
             }

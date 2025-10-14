@@ -4,17 +4,18 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.hamidul.dms.R;
 import com.hamidul.dms.Service.Model.User;
@@ -25,34 +26,33 @@ import com.hamidul.dms.ViewModel.DMSViewModel;
 
 import java.util.ArrayList;
 
-public class UserFragment extends Fragment {
+public class DeliveredUserFragment extends Fragment {
+
     private TextView tvNoDataToFound;
     private ProgressBar progressBar;
     private RecyclerView recyclerView;
     private UserAdapter adapter;
     private DMSViewModel viewModel;
 
-    public UserFragment() {
-
-    }
+    public DeliveredUserFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View myView = inflater.inflate(R.layout.fragment_user, container, false);
+        View myView = inflater.inflate(R.layout.fragment_delivered_user, container, false);
         findViewById(myView);
 
         adapter = new UserAdapter(getContext(), new UserAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(User user) {
                 getParentFragmentManager().beginTransaction()
-                        .replace(R.id.frameLayout, ViewOrderFragment.newInstance(user))
+                        .replace(R.id.frameLayout, OutletWiseReportFragment.newInstance(user))
                         .addToBackStack(null)
                         .commit();
             }
         });
         recyclerView.setAdapter(adapter);
 
-        viewModel.getUsers().observe(getViewLifecycleOwner(), new Observer<Resource<ArrayList<User>>>() {
+        viewModel.getDeliveredUsers().observe(getViewLifecycleOwner(), new Observer<Resource<ArrayList<User>>>() {
             @Override
             public void onChanged(Resource<ArrayList<User>> resource) {
                 if (resource.status == Resource.Status.LOADING) {
@@ -80,7 +80,6 @@ public class UserFragment extends Fragment {
         return myView;
     }
 
-    //************************************************************************************
     private void findViewById(View myView) {
         viewModel = new ViewModelProvider(this).get(DMSViewModel.class);
         tvNoDataToFound = myView.findViewById(R.id.tvNoDataToFound);
@@ -89,11 +88,9 @@ public class UserFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
-    //************************************************************************************
     @Override
     public void onResume() {
         super.onResume();
-        //Objects.requireNonNull(((AppCompatActivity) requireActivity()).getSupportActionBar()).setTitle("On Transit Order");
-        ((MainActivity) requireActivity()).setToolbarTitle("On Transit Order");
+        ((MainActivity) requireActivity()).setToolbarTitle("Outlet Wise Report");
     }
 }
