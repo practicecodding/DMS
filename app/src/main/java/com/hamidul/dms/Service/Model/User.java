@@ -9,12 +9,7 @@ public class User implements Parcelable {
     private int id;
     private String name;
 
-    public User() {
-    }
-
-    public User(int id, String name) {
-        this.id = id;
-        this.name = name;
+    private User() {
     }
 
     protected User(Parcel in) {

@@ -56,7 +56,6 @@ public class DailyOrderSummaryFragment extends Fragment {
                     tvNoDataToFound.setVisibility(VISIBLE);
                     progressBar.setVisibility(GONE);
                     recyclerView.setVisibility(GONE);
-                    ToastInstance.getInstance(getContext()).setToast(resource.message);
                 } else if (resource.status == Resource.Status.SUCCESS) {
                     tvNoDataToFound.setVisibility(GONE);
                     progressBar.setVisibility(GONE);

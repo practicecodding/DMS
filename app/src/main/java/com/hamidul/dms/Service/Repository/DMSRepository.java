@@ -16,6 +16,7 @@ import com.hamidul.dms.Service.Model.Report;
 import com.hamidul.dms.Service.Model.User;
 import com.hamidul.dms.Service.Network.ApiServices;
 import com.hamidul.dms.Service.Network.VolleyInstance;
+import com.hamidul.dms.View.Manager.ToastInstance;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,7 +47,7 @@ public class DMSRepository implements RepositoryImpl {
                 ArrayList<User> users = new ArrayList<>();
                 boolean hasError = false;
 
-                for (int i = 0; i < response.length(); i++){
+                for (int i = 0; i < response.length(); i++) {
                     try {
                         JSONObject object = response.getJSONObject(i);
                         users.add(User.fromJson(object));
@@ -55,7 +56,7 @@ public class DMSRepository implements RepositoryImpl {
                     }
                 }
 
-                if (users.isEmpty()){
+                if (users.isEmpty()) {
                     liveData.setValue(Resource.empty());
                 } else if (hasError) {
                     liveData.setValue(Resource.error("Some items failed to parse"));
@@ -106,7 +107,7 @@ public class DMSRepository implements RepositoryImpl {
                 ArrayList<OrderedOutlet> outlets = new ArrayList<>();
                 boolean hasError = false;
 
-                for (int i = 0; i < response.length(); i++){
+                for (int i = 0; i < response.length(); i++) {
                     try {
                         JSONObject object = response.getJSONObject(i);
                         outlets.add(OrderedOutlet.fromJson(object));
@@ -115,7 +116,7 @@ public class DMSRepository implements RepositoryImpl {
                     }
                 }
 
-                if (outlets.isEmpty()){
+                if (outlets.isEmpty()) {
                     liveData.setValue(Resource.empty());
                 } else if (hasError) {
                     liveData.setValue(Resource.error("Some items failed to parse"));
@@ -155,14 +156,9 @@ public class DMSRepository implements RepositoryImpl {
         StringRequest stringRequest = new StringRequest(Request.Method.POST, ApiServices.getReport, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
-
                 try {
                     JSONObject object = new JSONObject(s);
-                    if (object.length() == 0){
-                        liveData.setValue(Resource.empty());
-                    } else {
-                        liveData.setValue(Resource.success(Report.fromJson(object)));
-                    }
+                    liveData.setValue(Resource.success(Report.fromJson(object)));
                 } catch (JSONException e) {
                     liveData.setValue(Resource.error("Parse error"));
                 }
@@ -190,7 +186,7 @@ public class DMSRepository implements RepositoryImpl {
                 ArrayList<DateWiseSummary> summaries = new ArrayList<>();
                 boolean hasError = false;
 
-                for (int i = 0; i < response.length(); i++){
+                for (int i = 0; i < response.length(); i++) {
                     try {
                         JSONObject object = response.getJSONObject(i);
                         summaries.add(DateWiseSummary.fromJson(object));
@@ -199,7 +195,7 @@ public class DMSRepository implements RepositoryImpl {
                     }
                 }
 
-                if (summaries.isEmpty()){
+                if (summaries.isEmpty()) {
                     liveData.setValue(Resource.empty());
                 } else if (hasError) {
                     liveData.setValue(Resource.error("Some items failed to parse"));

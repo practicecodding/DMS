@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -25,7 +26,7 @@ import com.hamidul.dms.ViewModel.DMSViewModel;
 import java.util.ArrayList;
 
 public class UserFragment extends Fragment {
-
+    private TextView tvNoDataToFound;
     private ProgressBar progressBar;
     private RecyclerView recyclerView;
     private UserAdapter adapter;
@@ -55,14 +56,22 @@ public class UserFragment extends Fragment {
             @Override
             public void onChanged(Resource<ArrayList<User>> resource) {
                 if (resource.status == Resource.Status.LOADING) {
+                    tvNoDataToFound.setVisibility(GONE);
                     progressBar.setVisibility(VISIBLE);
                     recyclerView.setVisibility(GONE);
+                } else if (resource.status == Resource.Status.EMPTY) {
+                    tvNoDataToFound.setVisibility(VISIBLE);
+                    progressBar.setVisibility(GONE);
+                    recyclerView.setVisibility(GONE);
                 } else if (resource.status == Resource.Status.SUCCESS) {
+                    tvNoDataToFound.setVisibility(GONE);
                     progressBar.setVisibility(GONE);
                     recyclerView.setVisibility(VISIBLE);
                     adapter.updateList(resource.data);
                 } else {
-                    progressBar.setVisibility(GONE);
+                    tvNoDataToFound.setVisibility(GONE);
+                    progressBar.setVisibility(VISIBLE);
+                    recyclerView.setVisibility(GONE);
                     ToastInstance.getInstance(getContext()).setToast(resource.message);
                 }
             }
@@ -74,6 +83,7 @@ public class UserFragment extends Fragment {
     //************************************************************************************
     private void findViewById(View myView) {
         viewModel = new ViewModelProvider(this).get(DMSViewModel.class);
+        tvNoDataToFound = myView.findViewById(R.id.tvNoDataToFound);
         progressBar = myView.findViewById(R.id.progressBar);
         recyclerView = myView.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
