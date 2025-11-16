@@ -71,6 +71,7 @@ public class DeliveredOutletAdapter extends RecyclerView.Adapter {
             deliveredViewHolder.tvOutletBanglaName.setText(outlet.getOutletBanglaName());
             deliveredViewHolder.tvOutletAddress.setText(outlet.getOutletAddress());
             deliveredViewHolder.tvNetDeliveryAmount.setText(String.format("%,.0f", outlet.getNetDelivery()));
+            deliveredViewHolder.tvDamageAmount.setText(String.format("%,.0f", outlet.getDamage()));
 
         }
 
