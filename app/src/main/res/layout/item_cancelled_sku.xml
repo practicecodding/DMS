@@ -16,7 +16,7 @@
         android:paddingTop="2dp"
         android:paddingEnd="6dp"
         android:paddingBottom="2dp"
-        android:weightSum="6">
+        android:weightSum="5">
 
         <TextView
             android:id="@+id/tvSkuName"
@@ -56,18 +56,6 @@
 
         <TextView
             android:id="@+id/tvOrderQuantity"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:fontFamily="sans-serif-medium"
-            android:gravity="center"
-            android:text="00"
-            android:textColor="@color/black"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/tvDeliveryQuantity"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

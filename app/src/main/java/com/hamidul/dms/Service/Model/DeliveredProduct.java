@@ -6,7 +6,7 @@ public class DeliveredProduct {
     private int productId;
     private String productName;
     private double tp;
-    private String orderDiscount, deliveryDiscount;
+    private double orderDiscount, deliveryDiscount;
     private int orderQuantity, deliveryQuantity;
     private double netOrderAmount;
 
@@ -37,19 +37,19 @@ public class DeliveredProduct {
         this.tp = tp;
     }
 
-    public String getOrderDiscount() {
+    public double getOrderDiscount() {
         return orderDiscount;
     }
 
-    public void setOrderDiscount(String orderDiscount) {
+    public void setOrderDiscount(double orderDiscount) {
         this.orderDiscount = orderDiscount;
     }
 
-    public String getDeliveryDiscount() {
+    public double getDeliveryDiscount() {
         return deliveryDiscount;
     }
 
-    public void setDeliveryDiscount(String deliveryDiscount) {
+    public void setDeliveryDiscount(double deliveryDiscount) {
         this.deliveryDiscount = deliveryDiscount;
     }
 
@@ -82,11 +82,11 @@ public class DeliveredProduct {
         product.productId = object.optInt("product_id");
         product.productName = object.optString("product_name");
         product.tp = object.optDouble("rate");
-        product.orderDiscount = object.optString("order_discount");
-        product.deliveryDiscount = object.optString("delivery_discount");
+        product.orderDiscount = object.optDouble("order_discount");
+        product.deliveryDiscount = object.optDouble("delivery_discount");
         product.orderQuantity = object.optInt("order_quantity");
         product.deliveryQuantity = object.optInt("delivery_quantity");
-        product.netOrderAmount = (product.orderQuantity * product.getTp()) - product.safeParseDouble(product.getOrderDiscount());
+        product.netOrderAmount = (product.orderQuantity * product.getTp()) - product.getOrderDiscount();
         return product;
     }
 

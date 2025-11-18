@@ -18,6 +18,7 @@ public class DeliveredOutlet {
     private double due;
 
     private DeliveredOutlet() {
+        this.products = new ArrayList<>();
     }
 
     public String getOutletName() {
@@ -106,20 +107,20 @@ public class DeliveredOutlet {
         outlet.outletBanglaName = object.optString("outlet_bangla_name");
         outlet.outletAddress = object.optString("outlet_address");
         outlet.date = object.optString("date");
-//        JSONArray arrayOrders = object.optJSONArray("orders");
-//        if (arrayOrders != null) {
-//            for (int x = 0; x < arrayOrders.length(); x++) {
-//                JSONObject productObject = arrayOrders.optJSONObject(x);
-//                if (productObject != null) {
-//                    outlet.products.add(DeliveredProduct.fromJson(productObject));
-//                }
-//            }
-//        }
+        JSONArray arrayOrders = object.optJSONArray("orders");
+        if (arrayOrders != null) {
+            for (int x = 0; x < arrayOrders.length(); x++) {
+                JSONObject productObject = arrayOrders.optJSONObject(x);
+                if (productObject != null) {
+                    outlet.products.add(DeliveredProduct.fromJson(productObject));
+                }
+            }
+        }
         outlet.netDelivery = object.optDouble("net_delivery");
-//        outlet.damage = object.optDouble("damage");
-//        outlet.commission = object.optDouble("commission");
-//        outlet.cash = object.optDouble("cash");
-//        outlet.due = object.optDouble("due");
+        outlet.damage = object.optDouble("damage");
+        outlet.commission = object.optDouble("commission");
+        outlet.cash = object.optDouble("cash");
+        outlet.due = object.optDouble("due");
 
         return outlet;
     }
