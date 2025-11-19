@@ -20,7 +20,7 @@ import android.widget.TextView;
 import com.hamidul.dms.R;
 import com.hamidul.dms.Service.Model.DeliveredOutlet;
 import com.hamidul.dms.Service.Model.User;
-import com.hamidul.dms.Service.Repository.Resource;
+import com.hamidul.dms.Service.Model.Resource;
 import com.hamidul.dms.View.Adapter.DeliveredOutletAdapter;
 import com.hamidul.dms.View.Manager.ToastInstance;
 import com.hamidul.dms.ViewModel.DMSViewModel;

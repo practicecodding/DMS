@@ -14,10 +14,10 @@ import com.hamidul.dms.Service.Model.DateWiseSummary;
 import com.hamidul.dms.Service.Model.DeliveredOutlet;
 import com.hamidul.dms.Service.Model.OrderedOutlet;
 import com.hamidul.dms.Service.Model.Report;
+import com.hamidul.dms.Service.Model.Resource;
 import com.hamidul.dms.Service.Model.User;
 import com.hamidul.dms.Service.Network.ApiServices;
 import com.hamidul.dms.Service.Network.VolleyInstance;
-import com.hamidul.dms.View.Manager.ToastInstance;
 
 import org.json.JSONArray;
 import org.json.JSONException;

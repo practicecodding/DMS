@@ -16,7 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.hamidul.dms.R;
 import com.hamidul.dms.Service.Model.Report;
-import com.hamidul.dms.Service.Repository.Resource;
+import com.hamidul.dms.Service.Model.Resource;
 import com.hamidul.dms.View.Manager.ToastInstance;
 import com.hamidul.dms.ViewModel.DMSViewModel;
 

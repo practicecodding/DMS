@@ -7,7 +7,7 @@ import com.hamidul.dms.Service.Model.DeliveredOutlet;
 import com.hamidul.dms.Service.Model.OrderedOutlet;
 import com.hamidul.dms.Service.Model.Report;
 import com.hamidul.dms.Service.Model.User;
-import com.hamidul.dms.Service.Repository.Resource;
+import com.hamidul.dms.Service.Model.Resource;
 
 import java.util.ArrayList;
 
