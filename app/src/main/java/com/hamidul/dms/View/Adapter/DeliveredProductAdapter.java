@@ -17,24 +17,24 @@ import java.util.ArrayList;
 public class DeliveredProductAdapter extends RecyclerView.Adapter {
     private final Context context;
     private final ArrayList<DeliveredProduct> products;
-    private final int CANCELLED_ITEM = 1;
-    private int DELIVERED_ITEM = 2;
+    private final boolean delivered;
 
-    public DeliveredProductAdapter(Context context, ArrayList<DeliveredProduct> products) {
+    public DeliveredProductAdapter(Context context, ArrayList<DeliveredProduct> products, boolean delivered) {
         this.context = context;
         this.products = products;
+        this.delivered = delivered;
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        if (viewType == CANCELLED_ITEM){
-            View myView = LayoutInflater.from(context).inflate(R.layout.item_cancelled_sku, parent, false);
-            return new CancelledProductViewHolder(myView);
-        } else {
+        if (delivered) {
             View myView = LayoutInflater.from(context).inflate(R.layout.item_delivered_sku, parent, false);
             return new DeliveredProductViewHolder(myView);
+        } else {
+            View myView = LayoutInflater.from(context).inflate(R.layout.item_cancelled_sku, parent, false);
+            return new CancelledProductViewHolder(myView);
         }
     }
 
@@ -43,43 +43,24 @@ public class DeliveredProductAdapter extends RecyclerView.Adapter {
 
         DeliveredProduct product = products.get(position);
 
-        if (getItemViewType(position) == CANCELLED_ITEM){
-
-            CancelledProductViewHolder cancelledProductViewHolder = (CancelledProductViewHolder) holder;
-            cancelledProductViewHolder.tvSkuName.setText(product.getProductName());
-
-            if (product.getOrderDiscount() % 1 == 0){
-                cancelledProductViewHolder.tvDiscount.setText(String.format("%,.0f", product.getOrderDiscount()));
-            } else {
-                cancelledProductViewHolder.tvDiscount.setText(String.format("%,.2f", product.getOrderDiscount()));
-            }
-
-            if (product.getTp() % 1 == 0){
-                cancelledProductViewHolder.tvTp.setText(String.format("%,.0f", product.getTp()));
-            } else {
-                cancelledProductViewHolder.tvTp.setText(String.format("%,.2f", product.getTp()));
-            }
-
-            cancelledProductViewHolder.tvOrderQuantity.setText(String.valueOf(product.getOrderQuantity()));
-
-        } else {
+        if (delivered) {
 
             DeliveredProductViewHolder deliveredProductViewHolder = (DeliveredProductViewHolder) holder;
             deliveredProductViewHolder.tvSkuName.setText(product.getProductName());
 
-            if (product.getTp() % 1 == 0){
+            if (product.getTp() % 1 == 0) {
                 deliveredProductViewHolder.tvTp.setText(String.format("%,.0f", product.getTp()));
             } else {
                 deliveredProductViewHolder.tvTp.setText(String.format("%,.2f", product.getTp()));
             }
 
-            if (product.getOrderDiscount() % 1 == 0){
+            if (product.getOrderDiscount() % 1 == 0) {
                 deliveredProductViewHolder.tvOrderDiscount.setText(String.format("%,.0f", product.getOrderDiscount()));
             } else {
                 deliveredProductViewHolder.tvOrderDiscount.setText(String.format("%,.2f", product.getOrderDiscount()));
             }
 
-            if (product.getDeliveryDiscount() % 1 == 0){
+            if (product.getDeliveryDiscount() % 1 == 0) {
                 deliveredProductViewHolder.tvDeliveryDiscount.setText(String.format("%,.0f", product.getDeliveryDiscount()));
             } else {
                 deliveredProductViewHolder.tvDeliveryDiscount.setText(String.format("%,.2f", product.getDeliveryDiscount()));
@@ -87,6 +68,25 @@ public class DeliveredProductAdapter extends RecyclerView.Adapter {
 
             deliveredProductViewHolder.tvOrderQuantity.setText(String.valueOf(product.getOrderQuantity()));
             deliveredProductViewHolder.tvDeliveryQuantity.setText(String.valueOf(product.getDeliveryQuantity()));
+
+        } else {
+
+            CancelledProductViewHolder cancelledProductViewHolder = (CancelledProductViewHolder) holder;
+            cancelledProductViewHolder.tvSkuName.setText(product.getProductName());
+
+            if (product.getOrderDiscount() % 1 == 0) {
+                cancelledProductViewHolder.tvDiscount.setText(String.format("%,.0f", product.getOrderDiscount()));
+            } else {
+                cancelledProductViewHolder.tvDiscount.setText(String.format("%,.2f", product.getOrderDiscount()));
+            }
+
+            if (product.getTp() % 1 == 0) {
+                cancelledProductViewHolder.tvTp.setText(String.format("%,.0f", product.getTp()));
+            } else {
+                cancelledProductViewHolder.tvTp.setText(String.format("%,.2f", product.getTp()));
+            }
+
+            cancelledProductViewHolder.tvOrderQuantity.setText(String.valueOf(product.getOrderQuantity()));
 
         }
 
@@ -99,6 +99,7 @@ public class DeliveredProductAdapter extends RecyclerView.Adapter {
 
     public static class CancelledProductViewHolder extends RecyclerView.ViewHolder {
         private final TextView tvSkuName, tvDiscount, tvTp, tvOrderQuantity;
+
         public CancelledProductViewHolder(@NonNull View itemView) {
             super(itemView);
             tvSkuName = itemView.findViewById(R.id.tvSkuName);
@@ -110,6 +111,7 @@ public class DeliveredProductAdapter extends RecyclerView.Adapter {
 
     public static class DeliveredProductViewHolder extends RecyclerView.ViewHolder {
         private final TextView tvSkuName, tvTp, tvOrderDiscount, tvDeliveryDiscount, tvOrderQuantity, tvDeliveryQuantity;
+
         public DeliveredProductViewHolder(@NonNull View itemView) {
             super(itemView);
             tvSkuName = itemView.findViewById(R.id.tvSkuName);
@@ -121,9 +123,4 @@ public class DeliveredProductAdapter extends RecyclerView.Adapter {
         }
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        if (products.get(position).getDeliveryQuantity() == 0) return CANCELLED_ITEM;
-        else return DELIVERED_ITEM;
-    }
 }

@@ -61,7 +61,7 @@ public class DeliveredOutletAdapter extends RecyclerView.Adapter {
             cancelledViewHolder.tvOutletBanglaName.setText(outlet.getOutletBanglaName());
             cancelledViewHolder.tvOutletAddress.setText(outlet.getOutletAddress());
 
-            DeliveredProductAdapter adapter = new DeliveredProductAdapter(context, outlet.getProducts());
+            DeliveredProductAdapter adapter = new DeliveredProductAdapter(context, outlet.getProducts(), false);
             cancelledViewHolder.recyclerView.setAdapter(adapter);
 
             double netOrder = 0;
@@ -82,7 +82,7 @@ public class DeliveredOutletAdapter extends RecyclerView.Adapter {
             deliveredViewHolder.tvOutletBanglaName.setText(outlet.getOutletBanglaName());
             deliveredViewHolder.tvOutletAddress.setText(outlet.getOutletAddress());
 
-            DeliveredProductAdapter adapter = new DeliveredProductAdapter(context, outlet.getProducts());
+            DeliveredProductAdapter adapter = new DeliveredProductAdapter(context, outlet.getProducts(), true);
             deliveredViewHolder.recyclerView.setAdapter(adapter);
 
             double netOrder = 0;
